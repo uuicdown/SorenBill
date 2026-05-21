@@ -1,30 +1,14 @@
 package com.soren.bill.ui.stats
 
-import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,6 +20,7 @@ import androidx.compose.ui.unit.sp
 import com.soren.bill.ui.theme.ExpenseRed
 import com.soren.bill.ui.theme.IncomeGreen
 import com.soren.bill.util.DateUtils
+import java.util.Calendar
 
 private val pieColors = listOf(
     Color(0xFFE74C3C), Color(0xFF3498DB), Color(0xFF2ECC71),
@@ -44,51 +29,84 @@ private val pieColors = listOf(
 )
 
 @Composable
-fun StatsScreen(viewModel: StatsViewModel) {
+fun StatsScreen(viewModel: StatsViewModel, onBack: () -> Unit) {
     val uiState by viewModel.uiState.collectAsState()
-
-    if (uiState.isLoading) {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            CircularProgressIndicator()
-        }
-        return
-    }
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
+        // 顶部栏：返回 + 月份切换
         item {
-            BigNumbersCard(
-                expense = uiState.monthlyExpense,
-                income = uiState.monthlyIncome
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = onBack) {
+                    Icon(Icons.Default.ArrowBack, contentDescription = "返回")
+                }
+                Spacer(Modifier.weight(1f))
+                IconButton(onClick = {
+                    val cal = Calendar.getInstance().apply { timeInMillis = uiState.currentMonthTimestamp }
+                    cal.add(Calendar.MONTH, -1)
+                    viewModel.switchMonth(cal.timeInMillis)
+                }) {
+                    Icon(Icons.Default.ChevronLeft, contentDescription = "上月")
+                }
+                Text(DateUtils.formatMonth(uiState.currentMonthTimestamp),
+                    style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                IconButton(onClick = {
+                    val cal = Calendar.getInstance().apply { timeInMillis = uiState.currentMonthTimestamp }
+                    cal.add(Calendar.MONTH, 1)
+                    viewModel.switchMonth(cal.timeInMillis)
+                }) {
+                    Icon(Icons.Default.ChevronRight, contentDescription = "下月")
+                }
+                Spacer(Modifier.width(48.dp)) // balance with back button
+            }
         }
 
-        if (uiState.expenseBreakdown.isNotEmpty()) {
+        if (uiState.isLoading) {
+            item { Box(modifier = Modifier.fillMaxWidth().height(200.dp), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
+            } }
+        } else {
             item {
-                Text(
-                    "支出分布",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold
-                )
+                BigNumbersCard(expense = uiState.monthlyExpense, income = uiState.monthlyIncome)
             }
-            item {
-                PieChartCard(uiState.expenseBreakdown, centerLabel = "支出")
-            }
-        }
 
-        if (uiState.incomeBreakdown.isNotEmpty()) {
-            item {
-                Text(
-                    "收入来源",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold
-                )
+            if (uiState.expenseBreakdown.isNotEmpty()) {
+                item {
+                    Text("支出分布", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                }
+                item {
+                    PieChartCard(uiState.expenseBreakdown, uiState.monthlyExpense)
+                }
             }
-            item {
-                PieChartCard(uiState.incomeBreakdown, centerLabel = "收入")
+
+            if (uiState.incomeBreakdown.isNotEmpty()) {
+                item {
+                    Text("收入来源", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                }
+                item {
+                    PieChartCard(uiState.incomeBreakdown, uiState.monthlyIncome)
+                }
+            }
+
+            if (uiState.expenseBreakdown.isEmpty() && uiState.incomeBreakdown.isEmpty()) {
+                item {
+                    Column(
+                        Modifier.fillMaxWidth().padding(vertical = 48.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Icon(Icons.Default.PieChart, null, Modifier.size(56.dp),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.25f))
+                        Spacer(Modifier.height(12.dp))
+                        Text("本月暂无收支数据", style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                }
             }
         }
 
@@ -139,7 +157,7 @@ fun StatColumn(label: String, amount: Double, color: Color) {
 }
 
 @Composable
-fun PieChartCard(breakdown: List<CategoryStat>, centerLabel: String) {
+fun PieChartCard(breakdown: List<CategoryStat>, totalAmount: Double) {
     Card(
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
@@ -175,9 +193,9 @@ fun PieChartCard(breakdown: List<CategoryStat>, centerLabel: String) {
                     )
                 }
                 Text(
-                    centerLabel,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    DateUtils.formatAmount(totalAmount),
+                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold, fontSize = 14.sp),
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
 

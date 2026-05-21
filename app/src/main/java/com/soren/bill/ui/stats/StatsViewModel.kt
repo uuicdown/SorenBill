@@ -7,24 +7,19 @@ import com.soren.bill.data.entity.Category
 import com.soren.bill.data.entity.Transaction
 import com.soren.bill.data.repository.BillRepository
 import com.soren.bill.util.DateUtils
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 data class CategoryStat(
-    val category: Category,
-    val amount: Double,
-    val percentage: Float = 0f
+    val category: Category, val amount: Double, val percentage: Float = 0f
 )
 
 data class StatsUiState(
-    val monthlyExpense: Double = 0.0,
-    val monthlyIncome: Double = 0.0,
+    val monthlyExpense: Double = 0.0, val monthlyIncome: Double = 0.0,
     val expenseBreakdown: List<CategoryStat> = emptyList(),
     val incomeBreakdown: List<CategoryStat> = emptyList(),
+    val currentMonthTimestamp: Long = System.currentTimeMillis(),
     val isLoading: Boolean = true
 )
 
@@ -33,69 +28,45 @@ class StatsViewModel(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(StatsUiState())
     val uiState: StateFlow<StatsUiState> = _uiState.asStateFlow()
+    private var loadJob: Job? = null
 
-    private val monthStart = DateUtils.getMonthStart()
-    private val monthEnd = DateUtils.getMonthEnd()
+    init { switchMonth(System.currentTimeMillis()) }
 
-    init {
-        loadStats()
-    }
+    fun switchMonth(timestamp: Long) {
+        val monthStart = DateUtils.getMonthStart(timestamp)
+        val monthEnd = DateUtils.getMonthEnd(timestamp)
+        _uiState.update { it.copy(currentMonthTimestamp = timestamp, isLoading = true) }
 
-    fun loadStats() {
-        viewModelScope.launch {
+        loadJob?.cancel()
+        loadJob = viewModelScope.launch {
             combine(
                 repository.getTransactionsByMonth(monthStart, monthEnd),
                 repository.getCategoriesByType("expense"),
                 repository.getCategoriesByType("income")
-            ) { transactions, expenseCategories, incomeCategories ->
-                buildState(transactions, expenseCategories, incomeCategories)
-            }.collect { state ->
-                _uiState.update { state }
-            }
+            ) { txs, expCats, incCats -> Triple(txs, expCats, incCats) }
+                .collect { (txs, expCats, incCats) ->
+                    _uiState.update { buildState(it, txs, expCats, incCats, timestamp) }
+                }
         }
     }
 
     private fun buildState(
-        transactions: List<Transaction>,
-        expenseCategories: List<Category>,
-        incomeCategories: List<Category>
+        prev: StatsUiState, txs: List<Transaction>,
+        expCats: List<Category>, incCats: List<Category>, ts: Long
     ): StatsUiState {
-        val expense = transactions
-            .filter { it.type == "expense" }
-            .sumOf { it.amount }
-        val income = transactions
-            .filter { it.type == "income" }
-            .sumOf { it.amount }
-
-        val expenseBreakdown = expenseCategories.mapNotNull { category ->
-            val sum = transactions
-                .filter { it.type == "expense" && it.categoryId == category.id }
-                .sumOf { it.amount }
-            if (sum > 0) {
-                CategoryStat(category, sum, if (expense > 0) (sum / expense).toFloat() else 0f)
-            } else {
-                null
-            }
+        val expense = txs.filter { it.type == "expense" }.sumOf { it.amount }
+        val income = txs.filter { it.type == "income" }.sumOf { it.amount }
+        val expBreak = expCats.mapNotNull { c ->
+            val s = txs.filter { it.type == "expense" && it.categoryId == c.id }.sumOf { it.amount }
+            if (s > 0) CategoryStat(c, s, if (expense > 0) (s / expense).toFloat() else 0f) else null
         }.sortedByDescending { it.amount }
-
-        val incomeBreakdown = incomeCategories.mapNotNull { category ->
-            val sum = transactions
-                .filter { it.type == "income" && it.categoryId == category.id }
-                .sumOf { it.amount }
-            if (sum > 0) {
-                CategoryStat(category, sum, if (income > 0) (sum / income).toFloat() else 0f)
-            } else {
-                null
-            }
+        val incBreak = incCats.mapNotNull { c ->
+            val s = txs.filter { it.type == "income" && it.categoryId == c.id }.sumOf { it.amount }
+            if (s > 0) CategoryStat(c, s, if (income > 0) (s / income).toFloat() else 0f) else null
         }.sortedByDescending { it.amount }
-
-        return StatsUiState(
-            monthlyExpense = expense,
-            monthlyIncome = income,
-            expenseBreakdown = expenseBreakdown,
-            incomeBreakdown = incomeBreakdown,
-            isLoading = false
-        )
+        return prev.copy(monthlyExpense = expense, monthlyIncome = income,
+            expenseBreakdown = expBreak, incomeBreakdown = incBreak,
+            currentMonthTimestamp = ts, isLoading = false)
     }
 
     class Factory(private val repository: BillRepository) : ViewModelProvider.Factory {

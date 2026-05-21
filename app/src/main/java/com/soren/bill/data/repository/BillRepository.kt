@@ -33,13 +33,14 @@ class BillRepository(
     suspend fun deleteCategory(id: Long) = categoryDao.delete(id)
 
     // Transaction
-    fun getAllTransactions(): Flow<List<Transaction>> = transactionDao.getAll()
-
     fun getTransactionsByMonth(start: Long, end: Long): Flow<List<Transaction>> =
         transactionDao.getByMonth(start, end)
 
     fun getRecentTransactions(limit: Int = 50): Flow<List<Transaction>> =
         transactionDao.getRecent(limit)
+
+    fun getAllTransactions(): Flow<List<Transaction>> =
+        transactionDao.getAllTransactions()
 
     fun getFilteredTransactions(
         type: String?,
@@ -70,4 +71,13 @@ class BillRepository(
 
     suspend fun getAccountExpense(accountId: Long): Double =
         transactionDao.getAccountExpense(accountId)
+
+    suspend fun getDayExpense(dayStart: Long, dayEnd: Long): Double =
+        transactionDao.getDayExpense(dayStart, dayEnd)
+
+    suspend fun getDayIncome(dayStart: Long, dayEnd: Long): Double =
+        transactionDao.getDayIncome(dayStart, dayEnd)
+
+    suspend fun getTransactionsForDay(dayStart: Long, dayEnd: Long): List<Transaction> =
+        transactionDao.getTransactionsForDay(dayStart, dayEnd)
 }

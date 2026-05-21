@@ -83,7 +83,19 @@ abstract class BillDatabase : RoomDatabase() {
             categoryDao.insert(Category(name = "医疗", type = "expense"))
             categoryDao.insert(Category(name = "人情", type = "expense"))
             categoryDao.insert(Category(name = "教育", type = "expense"))
+            categoryDao.insert(Category(name = "通讯", type = "expense"))
+            categoryDao.insert(Category(name = "服饰", type = "expense"))
+            categoryDao.insert(Category(name = "日用", type = "expense"))
+            categoryDao.insert(Category(name = "数码", type = "expense"))
+            categoryDao.insert(Category(name = "宠物", type = "expense"))
+            categoryDao.insert(Category(name = "运动", type = "expense"))
+            categoryDao.insert(Category(name = "旅行", type = "expense"))
+            categoryDao.insert(Category(name = "美容", type = "expense"))
+            categoryDao.insert(Category(name = "零食", type = "expense"))
+            categoryDao.insert(Category(name = "水果", type = "expense"))
+            categoryDao.insert(Category(name = "外卖", type = "expense"))
             categoryDao.insert(Category(name = "其它", type = "expense"))
+            categoryDao.insert(Category(name = "余额调整", type = "expense"))
         }
 
         if (categoryDao.countByType("income") == 0) {
@@ -92,7 +104,12 @@ abstract class BillDatabase : RoomDatabase() {
             categoryDao.insert(Category(name = "兼职", type = "income"))
             categoryDao.insert(Category(name = "理财", type = "income"))
             categoryDao.insert(Category(name = "退款", type = "income"))
+            categoryDao.insert(Category(name = "红包", type = "income"))
+            categoryDao.insert(Category(name = "报销", type = "income"))
+            categoryDao.insert(Category(name = "房租收入", type = "income"))
+            categoryDao.insert(Category(name = "转让", type = "income"))
             categoryDao.insert(Category(name = "其它", type = "income"))
+            categoryDao.insert(Category(name = "余额调整", type = "income"))
         }
     }
 }

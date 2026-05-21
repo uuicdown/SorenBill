@@ -4,13 +4,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
-import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -26,8 +21,11 @@ import com.soren.bill.ui.add.AddTransactionViewModel
 import com.soren.bill.ui.assets.AssetsScreen
 import com.soren.bill.ui.assets.AssetsViewModel
 import com.soren.bill.ui.calendar.CalendarScreen
+import com.soren.bill.ui.calendar.CalendarViewModel
 import com.soren.bill.ui.home.HomeScreen
 import com.soren.bill.ui.home.HomeViewModel
+import com.soren.bill.ui.profile.ProfileScreen
+import com.soren.bill.ui.profile.ProfileViewModel
 import com.soren.bill.ui.stats.StatsScreen
 import com.soren.bill.ui.stats.StatsViewModel
 
@@ -40,10 +38,10 @@ sealed class Screen(
     object Home : Screen("home", "首页", Icons.Outlined.Home, Icons.Filled.Home)
     object Calendar : Screen("calendar", "日历", Icons.Outlined.CalendarMonth, Icons.Filled.CalendarMonth)
     object Assets : Screen("assets", "资产", Icons.Outlined.AccountBalanceWallet, Icons.Filled.AccountBalanceWallet)
-    object Stats : Screen("stats", "统计", Icons.Outlined.PieChart, Icons.Filled.PieChart)
+    object Profile : Screen("profile", "我的", Icons.Outlined.Person, Icons.Filled.Person)
 }
 
-val bottomNavItems = listOf(Screen.Home, Screen.Calendar, Screen.Assets, Screen.Stats)
+val bottomNavItems = listOf(Screen.Home, Screen.Calendar, Screen.Assets, Screen.Profile)
 
 @Composable
 fun AppNavigation(repository: BillRepository) {
@@ -62,12 +60,7 @@ fun AppNavigation(repository: BillRepository) {
                             it.route == screen.route
                         } == true
                         NavigationBarItem(
-                            icon = {
-                                Icon(
-                                    if (selected) screen.selectedIcon else screen.icon,
-                                    contentDescription = screen.title
-                                )
-                            },
+                            icon = { Icon(if (selected) screen.selectedIcon else screen.icon, contentDescription = screen.title) },
                             label = { Text(screen.title) },
                             selected = selected,
                             onClick = {
@@ -90,11 +83,16 @@ fun AppNavigation(repository: BillRepository) {
         ) {
             composable(Screen.Home.route) {
                 val vm: HomeViewModel = viewModel(factory = HomeViewModel.Factory(repository))
-                HomeScreen(viewModel = vm, onAddClick = { navController.navigate("add_transaction") })
+                HomeScreen(
+                    viewModel = vm,
+                    onAddClick = { navController.navigate("add_transaction") },
+                    onStatsClick = { navController.navigate("stats") }
+                )
             }
 
             composable(Screen.Calendar.route) {
-                CalendarScreen()
+                val vm: CalendarViewModel = viewModel(factory = CalendarViewModel.Factory(repository))
+                CalendarScreen(viewModel = vm)
             }
 
             composable(Screen.Assets.route) {
@@ -102,14 +100,19 @@ fun AppNavigation(repository: BillRepository) {
                 AssetsScreen(viewModel = vm)
             }
 
-            composable(Screen.Stats.route) {
-                val vm: StatsViewModel = viewModel(factory = StatsViewModel.Factory(repository))
-                StatsScreen(viewModel = vm)
+            composable(Screen.Profile.route) {
+                val vm: ProfileViewModel = viewModel(factory = ProfileViewModel.Factory(repository))
+                ProfileScreen(viewModel = vm)
             }
 
             composable("add_transaction") {
                 val vm: AddTransactionViewModel = viewModel(factory = AddTransactionViewModel.Factory(repository))
                 AddTransactionScreen(viewModel = vm, onNavigateBack = { navController.popBackStack() })
+            }
+
+            composable("stats") {
+                val vm: StatsViewModel = viewModel(factory = StatsViewModel.Factory(repository))
+                StatsScreen(viewModel = vm, onBack = { navController.popBackStack() })
             }
         }
     }

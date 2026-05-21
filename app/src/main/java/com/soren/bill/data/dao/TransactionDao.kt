@@ -16,6 +16,9 @@ interface TransactionDao {
     """)
     fun getByMonth(startOfMonth: Long, endOfMonth: Long): Flow<List<Transaction>>
 
+    @Query("SELECT * FROM transactions ORDER BY date DESC, created_at DESC")
+    fun getAllTransactions(): Flow<List<Transaction>>
+
     @Query("SELECT * FROM transactions ORDER BY date DESC, created_at DESC LIMIT :limit")
     fun getRecent(limit: Int = 50): Flow<List<Transaction>>
 
@@ -75,4 +78,25 @@ interface TransactionDao {
         FROM transactions WHERE account_id = :accountId AND type = 'expense'
     """)
     suspend fun getAccountExpense(accountId: Long): Double
+
+    @Query("""
+        SELECT COALESCE(SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END), 0)
+        FROM transactions
+        WHERE date BETWEEN :dayStart AND :dayEnd
+    """)
+    suspend fun getDayExpense(dayStart: Long, dayEnd: Long): Double
+
+    @Query("""
+        SELECT COALESCE(SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END), 0)
+        FROM transactions
+        WHERE date BETWEEN :dayStart AND :dayEnd
+    """)
+    suspend fun getDayIncome(dayStart: Long, dayEnd: Long): Double
+
+    @Query("""
+        SELECT * FROM transactions
+        WHERE date BETWEEN :dayStart AND :dayEnd
+        ORDER BY date DESC, created_at DESC
+    """)
+    suspend fun getTransactionsForDay(dayStart: Long, dayEnd: Long): List<Transaction>
 }

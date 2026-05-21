@@ -2,33 +2,13 @@ package com.soren.bill.ui.calendar
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,191 +20,140 @@ import androidx.compose.ui.unit.sp
 import com.soren.bill.ui.theme.ExpenseRed
 import com.soren.bill.ui.theme.IncomeGreen
 import com.soren.bill.util.DateUtils
-import java.util.Calendar
+import java.text.SimpleDateFormat
+import java.util.*
 
-data class DayInfo(
-    val day: Int,
-    val date: Long,
-    val isCurrentMonth: Boolean,
-    val isToday: Boolean,
-    val expense: Double = 0.0,
-    val income: Double = 0.0
+private val holidayMap = mapOf(
+    "2026-01-01" to "元旦", "2026-02-17" to "除夕", "2026-02-18" to "春节",
+    "2026-05-01" to "劳动节", "2026-05-31" to "端午", "2026-10-01" to "国庆", "2026-10-04" to "中秋"
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CalendarScreen() {
+fun CalendarScreen(viewModel: CalendarViewModel) {
     val cal = Calendar.getInstance()
-    val todayDay = cal.get(Calendar.DAY_OF_MONTH)
+    val today = cal.get(Calendar.DAY_OF_MONTH)
+    val todayYear = cal.get(Calendar.YEAR)
+    val todayMonth = cal.get(Calendar.MONTH)
+    val fmt = remember { SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()) }
 
-    var currentMonth by remember { mutableStateOf(cal.timeInMillis) }
-    val displayCal = Calendar.getInstance().apply { timeInMillis = currentMonth }
+    var current by remember { mutableStateOf(cal.timeInMillis) }
+    val uiState by viewModel.uiState.collectAsState()
+    LaunchedEffect(current) { viewModel.loadMonth(current) }
 
-    val monthLabel = remember(currentMonth) { DateUtils.formatMonth(currentMonth) }
-    val daysInMonth = remember(currentMonth) { displayCal.getActualMaximum(Calendar.DAY_OF_MONTH) }
-    val firstDayOfWeek = remember(currentMonth) {
-        Calendar.getInstance().apply {
-            timeInMillis = currentMonth
-            set(Calendar.DAY_OF_MONTH, 1)
-        }.get(Calendar.DAY_OF_WEEK) - 1
+    val monthLabel = remember(current) { DateUtils.formatMonth(current) }
+    val displayCal = remember(current) { Calendar.getInstance().apply { timeInMillis = current } }
+    val daysInMonth = remember(current) { displayCal.getActualMaximum(Calendar.DAY_OF_MONTH) }
+    val firstDow = remember(current) {
+        Calendar.getInstance().apply { timeInMillis = current; set(Calendar.DAY_OF_MONTH, 1) }.get(Calendar.DAY_OF_WEEK) - 1
     }
 
-    val days = remember(currentMonth) {
-        val list = mutableListOf<DayInfo>()
-        if (firstDayOfWeek > 0) {
-            for (i in 0 until firstDayOfWeek) {
-                list.add(DayInfo(0, 0, false, false))
-            }
-        }
-        for (d in 1..daysInMonth) {
-            val dateCal = Calendar.getInstance().apply {
-                timeInMillis = currentMonth
-                set(Calendar.DAY_OF_MONTH, d)
-                set(Calendar.HOUR_OF_DAY, 0)
-                set(Calendar.MINUTE, 0)
-                set(Calendar.SECOND, 0)
-                set(Calendar.MILLISECOND, 0)
-            }
-            val isToday = d == todayDay &&
-                    dateCal.get(Calendar.MONTH) == cal.get(Calendar.MONTH) &&
-                    dateCal.get(Calendar.YEAR) == cal.get(Calendar.YEAR)
-            list.add(DayInfo(d, dateCal.timeInMillis, true, isToday))
-        }
+    var selectedDay by remember { mutableStateOf<Int?>(null) }
+    var selectedDate by remember { mutableStateOf(0L) }
+
+    // Build day cells as flat list with padding
+    val cells = remember(current, uiState.dailyExpenses) {
+        val list = mutableListOf<Int?>() // null = empty cell, Int = day number
+        repeat(firstDow) { list.add(null) }
+        (1..daysInMonth).forEach { list.add(it) }
         list
     }
 
     val dayNames = listOf("日", "一", "二", "三", "四", "五", "六")
 
-    Scaffold(
-        topBar = {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(onClick = {
-                    displayCal.add(Calendar.MONTH, -1)
-                    currentMonth = displayCal.timeInMillis
-                }) {
-                    Text("<", fontWeight = FontWeight.Bold, fontSize = 18.sp)
-                }
-                Text(monthLabel, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-                IconButton(onClick = {
-                    displayCal.add(Calendar.MONTH, 1)
-                    currentMonth = displayCal.timeInMillis
-                }) {
-                    Text(">", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
+        // Header
+        Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 12.dp),
+            horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+            TextButton(onClick = { displayCal.add(Calendar.MONTH, -1); current = displayCal.timeInMillis }) { Text("◀", fontSize = 14.sp, color = MaterialTheme.colorScheme.primary) }
+            Text(monthLabel, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+            TextButton(onClick = { displayCal.add(Calendar.MONTH, 1); current = displayCal.timeInMillis }) { Text("▶", fontSize = 14.sp, color = MaterialTheme.colorScheme.primary) }
+        }
+
+        // Day names
+        Row(Modifier.fillMaxWidth().padding(horizontal = 4.dp)) {
+            dayNames.forEachIndexed { i, n ->
+                val wk = i == 0 || i == 6
+                Text(n, Modifier.weight(1f), textAlign = TextAlign.Center, style = MaterialTheme.typography.labelMedium,
+                    color = if (wk) ExpenseRed.copy(alpha = 0.6f) else MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.Medium)
+            }
+        }
+        Spacer(Modifier.height(4.dp))
+
+        // Calendar rows (max 6 rows) - use fixed height cells
+        val screenWidth = 360 // approximate dp
+        val cellSize = (screenWidth - 8) / 7 // 4dp padding each side
+        for (row in 0..5) {
+            val start = row * 7
+            val end = minOf(start + 7, cells.size)
+            if (start >= cells.size) break
+            Row(Modifier.fillMaxWidth().padding(horizontal = 4.dp).height(cellSize.dp)) {
+                for (i in start until end) {
+                    Box(Modifier.weight(1f).fillMaxHeight()) {
+                        val day = cells.getOrNull(i)
+                        if (day != null) {
+                            val dc = Calendar.getInstance().apply { timeInMillis = current; set(Calendar.DAY_OF_MONTH, day) }
+                            val isT = day == today && dc.get(Calendar.MONTH) == todayMonth && dc.get(Calendar.YEAR) == todayYear
+                            val dow = dc.get(Calendar.DAY_OF_WEEK)
+                            val wkd = dow == Calendar.SATURDAY || dow == Calendar.SUNDAY
+                            val ds = fmt.format(Date(dc.timeInMillis))
+                            val hol = holidayMap[ds]
+                            val exp = uiState.dailyExpenses[day] ?: 0.0
+
+                            val bg = if (isT) MaterialTheme.colorScheme.primary else Color.Transparent
+                            val tc = when { isT -> Color.White; hol != null -> ExpenseRed; wkd -> ExpenseRed.copy(alpha = 0.5f); else -> MaterialTheme.colorScheme.onSurface }
+
+                            Box(Modifier.fillMaxSize().padding(2.dp).clip(if (isT) CircleShape else RoundedCornerShape(8.dp))
+                                .background(bg).clickable { dc.set(Calendar.HOUR_OF_DAY, 0); dc.set(Calendar.MINUTE, 0); selectedDate = dc.timeInMillis; selectedDay = day },
+                                contentAlignment = Alignment.Center) {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    Text("$day", fontSize = 13.sp, fontWeight = if (isT) FontWeight.Bold else FontWeight.Normal, color = tc)
+                                    if (hol != null) Text(hol, fontSize = 8.sp, color = ExpenseRed, maxLines = 1, fontWeight = FontWeight.Medium)
+                                    else if (exp > 0) Text(DateUtils.formatAmount(exp), fontSize = 7.sp, color = if (isT) Color.White.copy(alpha = 0.7f) else ExpenseRed, maxLines = 1)
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
-    ) { padding ->
-        Column(modifier = Modifier.padding(padding)) {
-            Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp)) {
-                dayNames.forEach { name ->
-                    Text(
-                        name,
-                        modifier = Modifier.weight(1f),
-                        textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontWeight = FontWeight.Medium
-                    )
-                }
+
+        Spacer(Modifier.height(12.dp))
+        HorizontalDivider(Modifier.padding(horizontal = 16.dp))
+        Spacer(Modifier.height(12.dp))
+        Text("日均预算: ¥0.00", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(horizontal = 16.dp))
+        Spacer(Modifier.height(6.dp))
+        Row(Modifier.padding(horizontal = 16.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            Surface(shape = RoundedCornerShape(6.dp), color = ExpenseRed.copy(alpha = 0.1f)) {
+                Text("超出预算", Modifier.padding(horizontal = 10.dp, vertical = 4.dp), style = MaterialTheme.typography.labelSmall, color = ExpenseRed)
             }
-            Spacer(modifier = Modifier.height(4.dp))
-
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(7),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 4.dp),
-                contentPadding = PaddingValues(0.dp)
-            ) {
-                items(days) { day ->
-                    CalendarDay(day)
-                }
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-            HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text(
-                "日均预算: ¥0.00",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.padding(horizontal = 16.dp)
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                LegendChip("超出日预算", ExpenseRed.copy(alpha = 0.15f), ExpenseRed)
-                LegendChip("未超出日预算", IncomeGreen.copy(alpha = 0.15f), IncomeGreen)
+            Surface(shape = RoundedCornerShape(6.dp), color = IncomeGreen.copy(alpha = 0.1f)) {
+                Text("未超预算", Modifier.padding(horizontal = 10.dp, vertical = 4.dp), style = MaterialTheme.typography.labelSmall, color = IncomeGreen)
             }
         }
-    }
-}
-
-@Composable
-fun CalendarDay(day: DayInfo) {
-    if (day.day == 0) {
-        Box(modifier = Modifier.aspectRatio(1f))
-        return
+        Spacer(Modifier.height(16.dp))
     }
 
-    val bgColor = when {
-        day.isToday -> MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
-        else -> Color.Transparent
-    }
-    val textColor = when {
-        day.isToday -> MaterialTheme.colorScheme.primary
-        else -> MaterialTheme.colorScheme.onSurface
-    }
-
-    Box(
-        modifier = Modifier
-            .aspectRatio(1f)
-            .padding(2.dp)
-            .clip(RoundedCornerShape(8.dp))
-            .background(bgColor)
-            .clickable { },
-        contentAlignment = Alignment.Center
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(
-                "${day.day}",
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = if (day.isToday) FontWeight.Bold else FontWeight.Normal,
-                color = textColor
-            )
-            if (day.expense > 0) {
-                Text(
-                    DateUtils.formatAmount(day.expense),
-                    fontSize = 8.sp,
-                    color = ExpenseRed
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun LegendChip(label: String, bg: Color, textColor: Color) {
-    Surface(
-        shape = RoundedCornerShape(6.dp),
-        color = bg
-    ) {
-        Text(
-            label,
-            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-            style = MaterialTheme.typography.labelSmall,
-            color = textColor
+    // Day detail dialog
+    selectedDay?.let { day ->
+        val dayStart = Calendar.getInstance().apply { timeInMillis = selectedDate; set(Calendar.HOUR_OF_DAY, 0); set(Calendar.MINUTE, 0) }.timeInMillis
+        val dayEnd = dayStart + 24L * 60 * 60 * 1000 - 1
+        val txs = uiState.allTransactions.filter { it.date in dayStart..dayEnd }
+        AlertDialog(
+            onDismissRequest = { selectedDay = null },
+            shape = RoundedCornerShape(16.dp),
+            title = { Text(DateUtils.formatMonth(selectedDate) + " ${day}日", fontWeight = FontWeight.Bold) },
+            text = {
+                if (txs.isEmpty()) Text("当天没有记录", color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(vertical = 16.dp))
+                else Column { txs.take(10).forEach { tx ->
+                    Row(Modifier.fillMaxWidth().padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Text(tx.note ?: "未备注", Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium)
+                        Text(DateUtils.formatAmount(tx.amount), style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold,
+                            color = if (tx.type == "expense") ExpenseRed else IncomeGreen))
+                    }
+                }}
+            },
+            confirmButton = { TextButton(onClick = { selectedDay = null }) { Text("关闭") } }
         )
     }
 }
