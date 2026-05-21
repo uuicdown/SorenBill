@@ -6,9 +6,6 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TransactionDao {
-    @Query("SELECT * FROM transactions ORDER BY date DESC, created_at DESC")
-    fun getAll(): Flow<List<Transaction>>
-
     @Query("""
         SELECT * FROM transactions 
         WHERE date BETWEEN :startOfMonth AND :endOfMonth 
