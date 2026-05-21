@@ -5,7 +5,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -17,6 +16,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.material.icons.Icons as M3Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.automirrored.filled.*
 
 // 银行名称 → 本地 PNG 图标映射
 private val bankIconMap = mapOf(
@@ -91,19 +93,17 @@ fun accountBrandColor(type: String): Color = when (type) {
 }
 
 // === 分类图标映射 ===
-import androidx.compose.material.icons.Icons as M3Icons
-import androidx.compose.material.icons.filled.*
 
 fun categoryIcon(name: String): androidx.compose.ui.graphics.vector.ImageVector = when (name) {
-    "餐饮" -> Restaurant; "交通" -> DirectionsBus; "购物" -> ShoppingCart
-    "娱乐" -> Movie; "居住" -> Home; "医疗" -> LocalHospital
-    "人情" -> Favorite; "教育" -> School; "通讯" -> Phone
-    "服饰" -> Checkroom; "日用" -> CleaningServices; "数码" -> Devices
-    "宠物" -> Pets; "运动" -> FitnessCenter; "旅行" -> Flight
-    "美容" -> Face; "零食" -> Icecream; "水果" -> LocalFlorist
-    "外卖" -> DeliveryDining; "工资" -> Paid; "奖金" -> EmojiEvents
-    "兼职" -> Work; "理财" -> TrendingUp; "退款" -> MoneyOff
-    "红包" -> CardGiftcard; "报销" -> Receipt; "房租收入" -> Apartment
-    "转让" -> SwapHoriz; "余额调整" -> Tune; "其它" -> MoreHoriz
-    else -> Circle
+    "餐饮" -> M3Icons.Filled.Restaurant; "交通" -> M3Icons.Filled.DirectionsBus; "购物" -> M3Icons.Filled.ShoppingCart
+    "娱乐" -> M3Icons.Filled.Movie; "居住" -> M3Icons.Filled.Home; "医疗" -> M3Icons.Filled.LocalHospital
+    "人情" -> M3Icons.Filled.Favorite; "教育" -> M3Icons.Filled.School; "通讯" -> M3Icons.Filled.Phone
+    "服饰" -> M3Icons.Filled.Checkroom; "日用" -> M3Icons.Filled.CleaningServices; "数码" -> M3Icons.Filled.Devices
+    "宠物" -> M3Icons.Filled.Pets; "运动" -> M3Icons.Filled.FitnessCenter; "旅行" -> M3Icons.Filled.Flight
+    "美容" -> M3Icons.Filled.Face; "零食" -> M3Icons.Filled.Icecream; "水果" -> M3Icons.Filled.LocalFlorist
+    "外卖" -> M3Icons.Filled.DeliveryDining; "工资" -> M3Icons.Filled.Paid; "奖金" -> M3Icons.Filled.EmojiEvents
+    "兼职" -> M3Icons.Filled.Work; "理财" -> M3Icons.AutoMirrored.Filled.TrendingUp; "退款" -> M3Icons.Filled.MoneyOff
+    "红包" -> M3Icons.Filled.CardGiftcard; "报销" -> M3Icons.Filled.Receipt; "房租收入" -> M3Icons.Filled.Apartment
+    "转让" -> M3Icons.Filled.SwapHoriz; "余额调整" -> M3Icons.Filled.Tune; "其它" -> M3Icons.Filled.MoreHoriz
+    else -> M3Icons.Filled.Circle
 }
