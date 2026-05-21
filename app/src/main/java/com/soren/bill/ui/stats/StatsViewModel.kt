@@ -54,14 +54,15 @@ class StatsViewModel(
         prev: StatsUiState, txs: List<Transaction>,
         expCats: List<Category>, incCats: List<Category>, ts: Long
     ): StatsUiState {
-        val expense = txs.filter { it.type == "expense" }.sumOf { it.amount }
-        val income = txs.filter { it.type == "income" }.sumOf { it.amount }
+        val realTxs = txs.filter { it.note != "手动调整余额" && it.note != "初始余额" }
+        val expense = realTxs.filter { it.type == "expense" }.sumOf { it.amount }
+        val income = realTxs.filter { it.type == "income" }.sumOf { it.amount }
         val expBreak = expCats.mapNotNull { c ->
-            val s = txs.filter { it.type == "expense" && it.categoryId == c.id }.sumOf { it.amount }
+            val s = realTxs.filter { it.type == "expense" && it.categoryId == c.id }.sumOf { it.amount }
             if (s > 0) CategoryStat(c, s, if (expense > 0) (s / expense).toFloat() else 0f) else null
         }.sortedByDescending { it.amount }
         val incBreak = incCats.mapNotNull { c ->
-            val s = txs.filter { it.type == "income" && it.categoryId == c.id }.sumOf { it.amount }
+            val s = realTxs.filter { it.type == "income" && it.categoryId == c.id }.sumOf { it.amount }
             if (s > 0) CategoryStat(c, s, if (income > 0) (s / income).toFloat() else 0f) else null
         }.sortedByDescending { it.amount }
         return prev.copy(monthlyExpense = expense, monthlyIncome = income,

@@ -116,26 +116,17 @@ fun GroupHeader(label: String) = Text(label, Modifier.padding(top = 4.dp), style
 @Composable
 fun AccountCard(bal: AccountBalance, onClick: () -> Unit) {
     Surface(shape = RoundedCornerShape(10.dp), color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f), modifier = Modifier.fillMaxWidth().clickable { onClick() }) {
-        Column(Modifier.padding(14.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                AccountIcon(bal.account.type, bal.account.name, 28.dp)
-                Spacer(Modifier.width(10.dp))
-                Text(bal.account.name, Modifier.weight(1f), style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
-                Column(horizontalAlignment = Alignment.End) {
-                    Text(DateUtils.formatAmount(bal.balance), style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, fontSize = 18.sp, color = if (bal.balance >= 0) IncomeGreen else ExpenseRed))
-                    if (bal.income > 0 || bal.expense > 0) Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text("收${DateUtils.formatAmount(bal.income)}", fontSize = 10.sp, color = IncomeGreen)
-                        Text("支${DateUtils.formatAmount(bal.expense)}", fontSize = 10.sp, color = ExpenseRed)
-                    }
-                }
-            }
-            if (bal.account.type == "credit_card" && bal.account.creditLimit > 0 && bal.account.paymentDueDay > 0) {
-                Spacer(Modifier.height(6.dp))
-                val today = java.util.Calendar.getInstance().get(java.util.Calendar.DAY_OF_MONTH)
-                val due = bal.account.paymentDueDay
-                val days = if (due > today) due - today else due + java.util.Calendar.getInstance().getActualMaximum(java.util.Calendar.DAY_OF_MONTH) - today
-                Text("可用 ${DateUtils.formatAmount(bal.account.creditLimit + bal.balance)} · 距还款 ${days}天", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            }
+        Row(Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
+            AccountIcon(bal.account.type, bal.account.name, 28.dp)
+            Spacer(Modifier.width(10.dp))
+            Text(bal.account.name, Modifier.weight(1f), style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
+            Text(DateUtils.formatAmount(bal.balance), style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, fontSize = 18.sp, color = if (bal.balance >= 0) IncomeGreen else ExpenseRed))
+        }
+        if (bal.account.type == "credit_card" && bal.account.creditLimit > 0 && bal.account.paymentDueDay > 0) {
+            val today = java.util.Calendar.getInstance().get(java.util.Calendar.DAY_OF_MONTH)
+            val due = bal.account.paymentDueDay
+            val days = if (due > today) due - today else due + java.util.Calendar.getInstance().getActualMaximum(java.util.Calendar.DAY_OF_MONTH) - today
+            Text("可用 ${DateUtils.formatAmount(bal.account.creditLimit + bal.balance)} · 距还款 ${days}天", Modifier.padding(start = 52.dp, bottom = 12.dp), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }

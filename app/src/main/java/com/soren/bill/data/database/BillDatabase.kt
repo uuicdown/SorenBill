@@ -67,11 +67,7 @@ abstract class BillDatabase : RoomDatabase() {
         }
 
         if (accountDao.count() == 0) {
-            accountDao.insert(Account(name = "微信", type = "wechat"))
-            accountDao.insert(Account(name = "支付宝", type = "alipay"))
-            accountDao.insert(Account(name = "银行卡", type = "bank_card"))
-            accountDao.insert(Account(name = "信用卡", type = "credit_card"))
-            accountDao.insert(Account(name = "现金", type = "cash"))
+            // 默认不预设账户 — 用户自行添加
         }
 
         if (categoryDao.countByType("expense") == 0) {

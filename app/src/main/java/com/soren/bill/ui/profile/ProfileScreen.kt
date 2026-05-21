@@ -43,6 +43,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.soren.bill.ui.theme.ExpenseRed
+import com.soren.bill.ui.theme.categoryIcon
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -102,7 +103,7 @@ fun ProfileScreen(viewModel: ProfileViewModel) {
         uiState.expenseCategories.forEach { category ->
             ManageableItem(
                 name = category.name,
-                icon = Icons.Default.Category,
+                icon = categoryIcon(category.name),
                 onDelete = { viewModel.deleteCategory(category) }
             )
         }
@@ -118,7 +119,7 @@ fun ProfileScreen(viewModel: ProfileViewModel) {
         uiState.incomeCategories.forEach { category ->
             ManageableItem(
                 name = category.name,
-                icon = Icons.Default.Category,
+                icon = categoryIcon(category.name),
                 onDelete = { viewModel.deleteCategory(category) }
             )
         }

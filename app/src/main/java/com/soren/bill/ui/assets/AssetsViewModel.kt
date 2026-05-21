@@ -18,8 +18,8 @@ data class AccountGroup(val label: String, val accounts: List<AccountBalance>, v
 data class AssetsUiState(
     val groups: List<AccountGroup> = emptyList(),
     val netAsset: Double = 0.0, val totalAsset: Double = 0.0, val totalLiability: Double = 0.0,
-    val wallets: List<Wallet> = emptyList(), val selectedWalletId: Long? = null,
-    val selectedWalletName: String = "全部钱包", val isLoading: Boolean = true
+    val wallets: List<Wallet> = emptyList(), val selectedWalletId: Long? = 1L,
+    val selectedWalletName: String = "日常钱包", val isLoading: Boolean = true
 )
 
 class AssetsViewModel(private val repository: BillRepository) : ViewModel() {
@@ -29,41 +29,53 @@ class AssetsViewModel(private val repository: BillRepository) : ViewModel() {
     init {
         viewModelScope.launch {
             repository.getAllWallets().collect { wallets ->
-                _uiState.update { it.copy(wallets = wallets) }
-                if (_uiState.value.selectedWalletId == null && wallets.isNotEmpty())
-                    selectWallet(wallets.first().id)
+                if (wallets.isNotEmpty()) {
+                    _uiState.update { it.copy(wallets = wallets, selectedWalletName = wallets.first().name) }
+                }
             }
         }
-        loadData()
-    }
-
-    private fun loadData() {
         viewModelScope.launch {
-            combine(repository.getAllAccounts(), repository.getAllTransactions()) { accounts, transactions ->
-                buildState(accounts, transactions)
-            }.collect { _uiState.update { it } }
+            repository.getAllAccounts().collect { accounts ->
+                updateState(accounts)
+            }
+        }
+        viewModelScope.launch {
+            repository.getAllTransactions().collect { _ ->
+                // re-trigger on any transaction change
+                val accounts = repository.getAllAccounts().first()
+                updateState(accounts)
+            }
         }
     }
 
-    fun selectWallet(walletId: Long?) {
-        _uiState.update {
-            val name = if (walletId == null) "全部钱包" else it.wallets.firstOrNull { w -> w.id == walletId }?.name ?: "全部钱包"
-            it.copy(selectedWalletId = walletId, selectedWalletName = name)
-        }
-    }
-
-    private fun buildState(accounts: List<Account>, transactions: List<Transaction>): AssetsUiState {
-        val walletId = _uiState.value.selectedWalletId
-        val filteredTxs = if (walletId == null) transactions else transactions.filter { it.walletId == walletId }
+    private suspend fun updateState(accounts: List<Account>) {
         val visible = accounts.filter { !it.isHidden }
+        val allTxs = repository.getAllTransactions().first()
+        val walletId = _uiState.value.selectedWalletId
+        val filteredTxs = if (walletId == null) allTxs else allTxs.filter { it.walletId == walletId }
+
         val balances = visible.map { account ->
             val atxs = filteredTxs.filter { it.accountId == account.id }
-            AccountBalance(account, atxs.filter { it.type == "income" }.sumOf { it.amount }, atxs.filter { it.type == "expense" }.sumOf { it.amount })
+            AccountBalance(account,
+                atxs.filter { it.type == "income" }.sumOf { it.amount },
+                atxs.filter { it.type == "expense" }.sumOf { it.amount })
         }
         val groups = buildGroups(balances)
         val totalAsset = balances.filter { it.balance >= 0 }.sumOf { it.balance }
         val totalLiability = balances.filter { it.balance < 0 }.sumOf { it.balance }
-        return _uiState.value.copy(groups = groups, netAsset = totalAsset + totalLiability, totalAsset = totalAsset, totalLiability = totalLiability, isLoading = false)
+        _uiState.update {
+            it.copy(groups = groups, netAsset = totalAsset + totalLiability,
+                totalAsset = totalAsset, totalLiability = totalLiability, isLoading = false)
+        }
+    }
+
+    fun selectWallet(walletId: Long?) {
+        val name = if (walletId == null) "全部钱包" else _uiState.value.wallets.firstOrNull { it.id == walletId }?.name ?: "全部钱包"
+        _uiState.update { it.copy(selectedWalletId = walletId, selectedWalletName = name) }
+        viewModelScope.launch {
+            val accounts = repository.getAllAccounts().first()
+            updateState(accounts)
+        }
     }
 
     private fun buildGroups(balances: List<AccountBalance>): List<AccountGroup> {
@@ -80,7 +92,23 @@ class AssetsViewModel(private val repository: BillRepository) : ViewModel() {
     }
 
     fun addAccount(name: String, type: String, creditLimit: Double, paymentDueDay: Int, initialBalance: Double) {
-        viewModelScope.launch { repository.insertAccount(Account(name = name, type = type, creditLimit = creditLimit, paymentDueDay = paymentDueDay)) }
+        viewModelScope.launch {
+            val accountId = repository.insertAccount(Account(name = name, type = type, creditLimit = creditLimit, paymentDueDay = paymentDueDay))
+            if (initialBalance != 0.0) {
+                // 创建初始余额调整
+                val type = if (initialBalance > 0) "income" else "expense"
+                val cats = repository.getCategoriesByType(type).first()
+                val catId = cats.firstOrNull { it.name == "余额调整" }?.id ?: cats.firstOrNull()?.id ?: 0L
+                val walletId = repository.getAllWallets().first().firstOrNull()?.id ?: 1L
+                if (catId > 0) {
+                    repository.insertTransaction(Transaction(
+                        amount = Math.abs(initialBalance), type = type,
+                        walletId = walletId, accountId = accountId, categoryId = catId,
+                        date = System.currentTimeMillis(), note = "初始余额"
+                    ))
+                }
+            }
+        }
     }
     fun updateAccount(account: Account) { viewModelScope.launch { repository.updateAccount(account) } }
     fun deleteAccount(account: Account) { viewModelScope.launch { repository.deleteAccount(account.id) } }
@@ -88,11 +116,20 @@ class AssetsViewModel(private val repository: BillRepository) : ViewModel() {
         val diff = newBal - bal.balance
         if (diff == 0.0) return
         viewModelScope.launch {
-            val type = if (diff > 0) "income" else "expense"
-            val cats = repository.getCategoriesByType(type).first()
-            val catId = cats.firstOrNull { it.name == "余额调整" }?.id ?: cats.firstOrNull()?.id ?: return@launch
-            val walletId = repository.getAllWallets().first().firstOrNull()?.id ?: return@launch
-            repository.insertTransaction(Transaction(amount = Math.abs(diff), type = type, walletId = walletId, accountId = bal.account.id, categoryId = catId, date = System.currentTimeMillis(), note = "手动调整余额"))
+            try {
+                val type = if (diff > 0) "income" else "expense"
+                val cats = repository.getCategoriesByType(type).first()
+                val catId = cats.firstOrNull { it.name == "余额调整" }?.id
+                    ?: cats.firstOrNull()?.id ?: 1L
+                val walletId = uiState.value.selectedWalletId
+                    ?: repository.getAllWallets().first().firstOrNull()?.id ?: 1L
+                repository.insertTransaction(Transaction(
+                    amount = Math.abs(diff), type = type,
+                    walletId = walletId, accountId = bal.account.id,
+                    categoryId = catId, date = System.currentTimeMillis(),
+                    note = "手动调整余额"
+                ))
+            } catch (_: Exception) { }
         }
     }
     class Factory(private val repository: BillRepository) : ViewModelProvider.Factory {

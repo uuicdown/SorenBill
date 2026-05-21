@@ -80,8 +80,11 @@ class HomeViewModel(
     }
 
     private suspend fun refreshSummary(monthStart: Long, monthEnd: Long) {
-        val expense = repository.sumByType("expense", monthStart, monthEnd)
-        val income = repository.sumByType("income", monthStart, monthEnd)
+        val txs = _uiState.value.transactions.filter { tx ->
+            tx.note != "手动调整余额" && tx.note != "初始余额"
+        }
+        val expense = txs.filter { it.type == "expense" }.sumOf { it.amount }
+        val income = txs.filter { it.type == "income" }.sumOf { it.amount }
         _uiState.update { it.copy(monthlyExpense = expense, monthlyIncome = income) }
     }
 
