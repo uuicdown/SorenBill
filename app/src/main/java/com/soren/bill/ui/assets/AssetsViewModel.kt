@@ -35,22 +35,18 @@ class AssetsViewModel(private val repository: BillRepository) : ViewModel() {
             }
         }
         viewModelScope.launch {
-            repository.getAllAccounts().collect { accounts ->
-                updateState(accounts)
-            }
-        }
-        viewModelScope.launch {
-            repository.getAllTransactions().collect { _ ->
-                // re-trigger on any transaction change
-                val accounts = repository.getAllAccounts().first()
-                updateState(accounts)
-            }
+            combine(
+                repository.getAllAccounts(),
+                repository.getAllTransactions()
+            ) { accounts, transactions -> Pair(accounts, transactions) }
+                .collect { (accounts, transactions) ->
+                    updateState(accounts, transactions)
+                }
         }
     }
 
-    private suspend fun updateState(accounts: List<Account>) {
+    private suspend fun updateState(accounts: List<Account>, transactions: List<Transaction> = repository.getAllTransactions().first()) {
         val visible = accounts.filter { !it.isHidden }
-        val allTxs = repository.getAllTransactions().first()
         val walletId = _uiState.value.selectedWalletId
         val filteredTxs = if (walletId == null) allTxs else allTxs.filter { it.walletId == walletId }
 
@@ -74,7 +70,8 @@ class AssetsViewModel(private val repository: BillRepository) : ViewModel() {
         _uiState.update { it.copy(selectedWalletId = walletId, selectedWalletName = name) }
         viewModelScope.launch {
             val accounts = repository.getAllAccounts().first()
-            updateState(accounts)
+            val transactions = repository.getAllTransactions().first()
+            updateState(accounts, transactions)
         }
     }
 

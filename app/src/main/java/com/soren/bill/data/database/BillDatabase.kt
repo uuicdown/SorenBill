@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.soren.bill.data.dao.AccountDao
 import com.soren.bill.data.dao.CategoryDao
@@ -19,8 +20,8 @@ import kotlinx.coroutines.launch
 
 @Database(
     entities = [Wallet::class, Account::class, Category::class, Transaction::class],
-    version = 2,
-    exportSchema = false
+    version = 3,
+    exportSchema = true
 )
 abstract class BillDatabase : RoomDatabase() {
     abstract fun walletDao(): WalletDao
@@ -31,6 +32,12 @@ abstract class BillDatabase : RoomDatabase() {
     companion object {
         @Volatile
         private var INSTANCE: BillDatabase? = null
+
+        private val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE categories ADD COLUMN is_adjustment INTEGER NOT NULL DEFAULT 0")
+            }
+        }
 
         fun getInstance(context: Context): BillDatabase {
             return INSTANCE ?: synchronized(this) {
@@ -44,6 +51,7 @@ abstract class BillDatabase : RoomDatabase() {
                 BillDatabase::class.java,
                 "soren_bill.db"
             )
+                .addMigrations(MIGRATION_2_3)
                 .fallbackToDestructiveMigration()
                 .addCallback(object : Callback() {
                     override fun onCreate(db: SupportSQLiteDatabase) {
@@ -91,7 +99,7 @@ abstract class BillDatabase : RoomDatabase() {
             categoryDao.insert(Category(name = "水果", type = "expense"))
             categoryDao.insert(Category(name = "外卖", type = "expense"))
             categoryDao.insert(Category(name = "其它", type = "expense"))
-            categoryDao.insert(Category(name = "余额调整", type = "expense"))
+            categoryDao.insert(Category(name = "余额调整", type = "expense", isAdjustment = true))
         }
 
         if (categoryDao.countByType("income") == 0) {
@@ -105,7 +113,7 @@ abstract class BillDatabase : RoomDatabase() {
             categoryDao.insert(Category(name = "房租收入", type = "income"))
             categoryDao.insert(Category(name = "转让", type = "income"))
             categoryDao.insert(Category(name = "其它", type = "income"))
-            categoryDao.insert(Category(name = "余额调整", type = "income"))
+            categoryDao.insert(Category(name = "余额调整", type = "income", isAdjustment = true))
         }
     }
 }

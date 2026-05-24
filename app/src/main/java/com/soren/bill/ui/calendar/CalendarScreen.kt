@@ -20,13 +20,7 @@ import androidx.compose.ui.unit.sp
 import com.soren.bill.ui.theme.ExpenseRed
 import com.soren.bill.ui.theme.IncomeGreen
 import com.soren.bill.util.DateUtils
-import java.text.SimpleDateFormat
 import java.util.*
-
-private val holidayMap = mapOf(
-    "2026-01-01" to "元旦", "2026-02-17" to "除夕", "2026-02-18" to "春节",
-    "2026-05-01" to "劳动节", "2026-05-31" to "端午", "2026-10-01" to "国庆", "2026-10-04" to "中秋"
-)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -35,7 +29,6 @@ fun CalendarScreen(viewModel: CalendarViewModel) {
     val today = cal.get(Calendar.DAY_OF_MONTH)
     val todayYear = cal.get(Calendar.YEAR)
     val todayMonth = cal.get(Calendar.MONTH)
-    val fmt = remember { SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()) }
 
     var current by remember { mutableStateOf(cal.timeInMillis) }
     val uiState by viewModel.uiState.collectAsState()
@@ -92,24 +85,18 @@ fun CalendarScreen(viewModel: CalendarViewModel) {
                     Box(Modifier.weight(1f).fillMaxHeight()) {
                         val day = cells.getOrNull(i)
                         if (day != null) {
-                            val dc = Calendar.getInstance().apply { timeInMillis = current; set(Calendar.DAY_OF_MONTH, day) }
-                            val isT = day == today && dc.get(Calendar.MONTH) == todayMonth && dc.get(Calendar.YEAR) == todayYear
-                            val dow = dc.get(Calendar.DAY_OF_WEEK)
-                            val wkd = dow == Calendar.SATURDAY || dow == Calendar.SUNDAY
-                            val ds = fmt.format(Date(dc.timeInMillis))
-                            val hol = holidayMap[ds]
-                            val exp = uiState.dailyExpenses[day] ?: 0.0
+                            val dayCal = Calendar.getInstance().apply { timeInMillis = current; set(Calendar.DAY_OF_MONTH, day) }
+                            val info = viewModel.getDayCellInfo(dayCal.timeInMillis, day, todayYear, todayMonth, today)
+                            val bg = if (info.isToday) MaterialTheme.colorScheme.primary else Color.Transparent
+                            val tc = when { info.isToday -> Color.White; info.holiday != null -> ExpenseRed; info.isWeekend -> ExpenseRed.copy(alpha = 0.5f); else -> MaterialTheme.colorScheme.onSurface }
 
-                            val bg = if (isT) MaterialTheme.colorScheme.primary else Color.Transparent
-                            val tc = when { isT -> Color.White; hol != null -> ExpenseRed; wkd -> ExpenseRed.copy(alpha = 0.5f); else -> MaterialTheme.colorScheme.onSurface }
-
-                            Box(Modifier.fillMaxSize().padding(2.dp).clip(if (isT) CircleShape else RoundedCornerShape(8.dp))
-                                .background(bg).clickable { dc.set(Calendar.HOUR_OF_DAY, 0); dc.set(Calendar.MINUTE, 0); selectedDate = dc.timeInMillis; selectedDay = day },
+                            Box(Modifier.fillMaxSize().padding(2.dp).clip(if (info.isToday) CircleShape else RoundedCornerShape(8.dp))
+                                .background(bg).clickable { dayCal.set(Calendar.HOUR_OF_DAY, 0); dayCal.set(Calendar.MINUTE, 0); selectedDate = dayCal.timeInMillis; selectedDay = day },
                                 contentAlignment = Alignment.Center) {
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                    Text("$day", fontSize = 13.sp, fontWeight = if (isT) FontWeight.Bold else FontWeight.Normal, color = tc)
-                                    if (hol != null) Text(hol, fontSize = 8.sp, color = ExpenseRed, maxLines = 1, fontWeight = FontWeight.Medium)
-                                    else if (exp > 0) Text(DateUtils.formatAmount(exp), fontSize = 7.sp, color = if (isT) Color.White.copy(alpha = 0.7f) else ExpenseRed, maxLines = 1)
+                                    Text("$day", fontSize = 13.sp, fontWeight = if (info.isToday) FontWeight.Bold else FontWeight.Normal, color = tc)
+                                    if (info.holiday != null) Text(info.holiday, fontSize = 8.sp, color = ExpenseRed, maxLines = 1, fontWeight = FontWeight.Medium)
+                                    else if (info.expense > 0) Text(DateUtils.formatAmount(info.expense), fontSize = 7.sp, color = if (info.isToday) Color.White.copy(alpha = 0.7f) else ExpenseRed, maxLines = 1)
                                 }
                             }
                         }

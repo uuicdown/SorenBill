@@ -54,7 +54,8 @@ class StatsViewModel(
         prev: StatsUiState, txs: List<Transaction>,
         expCats: List<Category>, incCats: List<Category>, ts: Long
     ): StatsUiState {
-        val realTxs = txs.filter { it.note != "手动调整余额" && it.note != "初始余额" }
+        val adjIds = (expCats + incCats).filter { it.isAdjustment }.map { it.id }.toSet()
+        val realTxs = txs.filter { it.categoryId !in adjIds }
         val expense = realTxs.filter { it.type == "expense" }.sumOf { it.amount }
         val income = realTxs.filter { it.type == "income" }.sumOf { it.amount }
         val expBreak = expCats.mapNotNull { c ->

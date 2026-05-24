@@ -4,7 +4,7 @@
     <application
         android:name=".BillApplication"
         android:allowBackup="true"
-        android:label="Soren的账本"
+        android:label="Soren的账单"
         android:supportsRtl="true"
         android:theme="@android:style/Theme.Material.Light.NoActionBar">
 

@@ -23,6 +23,9 @@ data class HomeUiState(
 ) {
     val categoryMap: Map<Long, String>
         get() = (expenseCategories + incomeCategories).associate { it.id to it.name }
+
+    val adjustmentCategoryIds: Set<Long>
+        get() = (expenseCategories + incomeCategories).filter { it.isAdjustment }.map { it.id }.toSet()
 }
 
 class HomeViewModel(
@@ -80,8 +83,9 @@ class HomeViewModel(
     }
 
     private suspend fun refreshSummary(monthStart: Long, monthEnd: Long) {
+        val adjIds = _uiState.value.adjustmentCategoryIds
         val txs = _uiState.value.transactions.filter { tx ->
-            tx.note != "手动调整余额" && tx.note != "初始余额"
+            tx.categoryId !in adjIds
         }
         val expense = txs.filter { it.type == "expense" }.sumOf { it.amount }
         val income = txs.filter { it.type == "income" }.sumOf { it.amount }
