@@ -1,0 +1,17 @@
+gradle.beforeProject { project ->
+    def kotlinExt = project.extensions.findByName("kotlin")
+    println("[init] beforeProject ${project.path}: hasKotlinExtension=${kotlinExt != null}")
+
+    project.pluginManager.withPlugin("org.jetbrains.kotlin.android") {
+        println("[init] applied org.jetbrains.kotlin.android to ${project.path}")
+    }
+    project.pluginManager.withPlugin("kotlin-android") {
+        println("[init] applied kotlin-android to ${project.path}")
+    }
+    project.pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
+        println("[init] applied org.jetbrains.kotlin.jvm to ${project.path}")
+    }
+    project.pluginManager.withPlugin("org.jetbrains.kotlin.plugin.compose") {
+        println("[init] applied org.jetbrains.kotlin.plugin.compose to ${project.path}")
+    }
+}

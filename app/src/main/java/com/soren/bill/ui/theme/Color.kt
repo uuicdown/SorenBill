@@ -2,29 +2,67 @@ package com.soren.bill.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// 极简深色系 — 低饱和、克制、高级感
-val Primary = Color(0xFF1A1A2E)
-val OnPrimary = Color(0xFFFFFFFF)
-val PrimaryContainer = Color(0xFFF0F0F5)
-val OnPrimaryContainer = Color(0xFF1A1A2E)
+// 清新明亮 - Light Theme Colors (iOS inspired)
+val LightPrimary = Color(0xFF007AFF)
+val LightOnPrimary = Color(0xFFFFFFFF)
+val LightPrimaryContainer = Color(0xFFE5F1FF)
+val LightOnPrimaryContainer = Color(0xFF005ECB)
 
-val Secondary = Color(0xFF5C6B7A)
-val OnSecondary = Color(0xFFFFFFFF)
-val SecondaryContainer = Color(0xFFF2F4F7)
-val OnSecondaryContainer = Color(0xFF3A4A5A)
+val LightSecondary = Color(0xFF5AC8FA)
+val LightOnSecondary = Color(0xFFFFFFFF)
+val LightSecondaryContainer = Color(0xFFE5F6FF)
+val LightOnSecondaryContainer = Color(0xFF004A77)
 
-val Surface = Color(0xFFFAFAFC)
-val OnSurface = Color(0xFF1A1A1E)
-val SurfaceVariant = Color(0xFFF5F5F7)
-val OnSurfaceVariant = Color(0xFF808590)
+val LightBackground = Color(0xFFF2F2F7)
+val LightOnBackground = Color(0xFF000000)
 
-val Background = Color(0xFFFFFFFF)
-val OnBackground = Color(0xFF1A1A1E)
+val LightSurface = Color(0xFFFFFFFF)
+val LightOnSurface = Color(0xFF000000)
+val LightSurfaceVariant = Color(0xFFE5E5EA)
+val LightOnSurfaceVariant = Color(0xFF8E8E93)
 
-val Error = Color(0xFFC0392B)
-val OnError = Color(0xFFFFFFFF)
+val LightError = Color(0xFFFF3B30)
+val LightOnError = Color(0xFFFFFFFF)
 
-// 金额专用色
-val ExpenseRed = Color(0xFFD64545)
-val IncomeGreen = Color(0xFF27AE60)
-val DividerGray = Color(0xFFEEEEEF)
+// 深色模式 - Dark Theme Colors (iOS inspired)
+val DarkPrimary = Color(0xFF0A84FF)
+val DarkOnPrimary = Color(0xFFFFFFFF)
+val DarkPrimaryContainer = Color(0xFF004085)
+val DarkOnPrimaryContainer = Color(0xFFCCE4FF)
+
+val DarkSecondary = Color(0xFF64D2FF)
+val DarkOnSecondary = Color(0xFF000000)
+val DarkSecondaryContainer = Color(0xFF004A77)
+val DarkOnSecondaryContainer = Color(0xFFCCE5FF)
+
+val DarkBackground = Color(0xFF000000)
+val DarkOnBackground = Color(0xFFFFFFFF)
+
+val DarkSurface = Color(0xFF1C1C1E)
+val DarkOnSurface = Color(0xFFFFFFFF)
+val DarkSurfaceVariant = Color(0xFF2C2C2E)
+val DarkOnSurfaceVariant = Color(0xFF98989D)
+
+val DarkError = Color(0xFFFF453A)
+val DarkOnError = Color(0xFF000000)
+
+val ExpenseRed = Color(0xFFFF3B30)
+val IncomeGreen = Color(0xFF34C759)
+
+val Primary = LightPrimary
+val OnPrimary = LightOnPrimary
+val PrimaryContainer = LightPrimaryContainer
+val OnPrimaryContainer = LightOnPrimaryContainer
+val Secondary = LightSecondary
+val OnSecondary = LightOnSecondary
+val SecondaryContainer = LightSecondaryContainer
+val OnSecondaryContainer = LightOnSecondaryContainer
+val Surface = LightSurface
+val OnSurface = LightOnSurface
+val SurfaceVariant = LightSurfaceVariant
+val OnSurfaceVariant = LightOnSurfaceVariant
+val Background = LightBackground
+val OnBackground = LightOnBackground
+val Error = LightError
+val OnError = LightOnError
+val DividerGray = LightSurfaceVariant

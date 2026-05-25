@@ -1,5 +1,6 @@
 package com.soren.bill.ui.assets
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -26,29 +27,41 @@ class AssetsViewModel(private val repository: BillRepository) : ViewModel() {
     private val _uiState = MutableStateFlow(AssetsUiState())
     val uiState: StateFlow<AssetsUiState> = _uiState.asStateFlow()
 
+    private val selectedWalletId = MutableStateFlow<Long?>(null)
+
     init {
         viewModelScope.launch {
             repository.getAllWallets().collect { wallets ->
-                if (wallets.isNotEmpty()) {
-                    _uiState.update { it.copy(wallets = wallets, selectedWalletName = wallets.first().name) }
+                if (wallets.isEmpty()) return@collect
+
+                val currentSelected = selectedWalletId.value
+                val nextSelected = when {
+                    currentSelected == null -> wallets.first().id
+                    wallets.any { it.id == currentSelected } -> currentSelected
+                    else -> wallets.first().id
                 }
+
+                selectedWalletId.value = nextSelected
+                val name = wallets.firstOrNull { it.id == nextSelected }?.name ?: wallets.first().name
+                _uiState.update { it.copy(wallets = wallets, selectedWalletId = nextSelected, selectedWalletName = name) }
             }
         }
         viewModelScope.launch {
             combine(
                 repository.getAllAccounts(),
-                repository.getAllTransactions()
-            ) { accounts, transactions -> Pair(accounts, transactions) }
-                .collect { (accounts, transactions) ->
-                    updateState(accounts, transactions)
-                }
+                repository.getAllTransactions(),
+                selectedWalletId
+            ) { accounts, transactions, walletId ->
+                Triple(accounts, transactions, walletId)
+            }.collect { (accounts, transactions, walletId) ->
+                updateState(accounts, transactions, walletId)
+            }
         }
     }
 
-    private suspend fun updateState(accounts: List<Account>, transactions: List<Transaction> = repository.getAllTransactions().first()) {
+    private fun updateState(accounts: List<Account>, transactions: List<Transaction>, walletId: Long?) {
         val visible = accounts.filter { !it.isHidden }
-        val walletId = _uiState.value.selectedWalletId
-        val filteredTxs = if (walletId == null) allTxs else allTxs.filter { it.walletId == walletId }
+        val filteredTxs = if (walletId == null) transactions else transactions.filter { it.walletId == walletId }
 
         val balances = visible.map { account ->
             val atxs = filteredTxs.filter { it.accountId == account.id }
@@ -58,21 +71,21 @@ class AssetsViewModel(private val repository: BillRepository) : ViewModel() {
         }
         val groups = buildGroups(balances)
         val totalAsset = balances.filter { it.balance >= 0 }.sumOf { it.balance }
-        val totalLiability = balances.filter { it.balance < 0 }.sumOf { it.balance }
+        val totalLiability = balances.filter { it.balance < 0 }.sumOf { -it.balance }
         _uiState.update {
-            it.copy(groups = groups, netAsset = totalAsset + totalLiability,
+            it.copy(groups = groups, netAsset = totalAsset - totalLiability,
                 totalAsset = totalAsset, totalLiability = totalLiability, isLoading = false)
         }
     }
 
     fun selectWallet(walletId: Long?) {
-        val name = if (walletId == null) "全部钱包" else _uiState.value.wallets.firstOrNull { it.id == walletId }?.name ?: "全部钱包"
-        _uiState.update { it.copy(selectedWalletId = walletId, selectedWalletName = name) }
-        viewModelScope.launch {
-            val accounts = repository.getAllAccounts().first()
-            val transactions = repository.getAllTransactions().first()
-            updateState(accounts, transactions)
+        selectedWalletId.value = walletId
+        val name = if (walletId == null) {
+            "全部钱包"
+        } else {
+            _uiState.value.wallets.firstOrNull { it.id == walletId }?.name ?: "全部钱包"
         }
+        _uiState.update { it.copy(selectedWalletId = walletId, selectedWalletName = name) }
     }
 
     private fun buildGroups(balances: List<AccountBalance>): List<AccountGroup> {
@@ -126,7 +139,9 @@ class AssetsViewModel(private val repository: BillRepository) : ViewModel() {
                     categoryId = catId, date = System.currentTimeMillis(),
                     note = "手动调整余额"
                 ))
-            } catch (_: Exception) { }
+            } catch (e: Exception) {
+                Log.e("AssetsViewModel", "adjustBalance failed", e)
+            }
         }
     }
     class Factory(private val repository: BillRepository) : ViewModelProvider.Factory {

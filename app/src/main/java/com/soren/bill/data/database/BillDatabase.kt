@@ -1,6 +1,7 @@
 package com.soren.bill.data.database
 
 import android.content.Context
+import androidx.annotation.VisibleForTesting
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -33,7 +34,8 @@ abstract class BillDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: BillDatabase? = null
 
-        private val MIGRATION_2_3 = object : Migration(2, 3) {
+        @VisibleForTesting
+        internal val MIGRATION_2_3: Migration = object : Migration(2, 3) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL("ALTER TABLE categories ADD COLUMN is_adjustment INTEGER NOT NULL DEFAULT 0")
             }

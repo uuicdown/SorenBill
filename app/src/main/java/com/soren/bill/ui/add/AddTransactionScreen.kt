@@ -1,5 +1,7 @@
-package com.soren.bill.ui.add
+﻿package com.soren.bill.ui.add
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -8,11 +10,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -43,7 +48,7 @@ fun AddTransactionScreen(viewModel: AddTransactionViewModel, onNavigateBack: () 
     Column(Modifier.fillMaxSize()) {
         // Top bar
         Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = onNavigateBack) { Icon(Icons.Default.ArrowBack, "返回") }
+            IconButton(onClick = onNavigateBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "返回") }
             Text("记一笔", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
         }
 
@@ -63,13 +68,35 @@ fun AddTransactionScreen(viewModel: AddTransactionViewModel, onNavigateBack: () 
 
             // 金额
             val color = if (uiState.type == "expense") ExpenseRed else IncomeGreen
-            Text(if (uiState.amount.isEmpty()) "¥0" else "¥${uiState.amount}",
-                Modifier.fillMaxWidth(), textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Bold, fontSize = 42.sp, color = color))
-            OutlinedTextField(value = uiState.amount, onValueChange = { viewModel.setAmount(it) },
-                modifier = Modifier.fillMaxWidth(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                placeholder = { Text("输入金额") }, singleLine = true,
-                textStyle = MaterialTheme.typography.headlineMedium.copy(textAlign = TextAlign.Center))
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 12.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                TextField(
+                    value = uiState.amount,
+                    onValueChange = { viewModel.setAmount(it) },
+                    modifier = Modifier.fillMaxWidth(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                    placeholder = { 
+                        Text("¥ 0.00", style = MaterialTheme.typography.displayMedium, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f), textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth()) 
+                    },
+                    singleLine = true,
+                    textStyle = MaterialTheme.typography.displayMedium.copy(
+                        textAlign = TextAlign.Center, 
+                        fontWeight = FontWeight.Bold, 
+                        color = color
+                    ),
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                        cursorColor = color
+                    )
+                )
+            }
 
             // 分类
             SectionLabel("分类")
@@ -108,6 +135,7 @@ fun AddTransactionScreen(viewModel: AddTransactionViewModel, onNavigateBack: () 
             // 保存按钮
             Button(onClick = { viewModel.save() }, Modifier.fillMaxWidth().height(50.dp),
                 shape = RoundedCornerShape(12.dp),
+                elevation = ButtonDefaults.buttonElevation(0.dp),
                 enabled = uiState.amount.toDoubleOrNull()?.let { it > 0 } == true
                         && uiState.selectedCategory != null && uiState.selectedAccount != null && uiState.selectedWallet != null) {
                 Text("保存", fontSize = 16.sp)
@@ -144,36 +172,70 @@ fun SectionLabel(text: String) {
     Text(text, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.Medium)
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun CategoryRow(cats: List<Category>, sel: Category?, onClick: (Category) -> Unit) {
-    LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        items(cats, key = { it.id }) { c ->
-            FilterChip(selected = sel?.id == c.id, onClick = { onClick(c) },
-                label = { Text(c.name) },
-                leadingIcon = { Icon(categoryIcon(c.name), null, Modifier.size(16.dp)) },
-                colors = FilterChipDefaults.filterChipColors(selectedContainerColor = MaterialTheme.colorScheme.primaryContainer))
+    FlowRow(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        cats.forEach { c ->
+            val selected = sel?.id == c.id
+            val bgColor = if (selected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+            val contentColor = if (selected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant
+            
+            Column(
+                modifier = Modifier
+                    .size(68.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(bgColor)
+                    .clickable { onClick(c) },
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Icon(categoryIcon(c.name), null, Modifier.size(28.dp), tint = contentColor)
+                Spacer(Modifier.height(6.dp))
+                Text(c.name, style = MaterialTheme.typography.labelSmall, color = contentColor)
+            }
         }
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun AccountRow(acts: List<Account>, sel: Account?, onClick: (Account) -> Unit) {
-    LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        items(acts, key = { it.id }) { a ->
-            FilterChip(selected = sel?.id == a.id, onClick = { onClick(a) },
+    FlowRow(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        acts.forEach { a ->
+            FilterChip(
+                selected = sel?.id == a.id, 
+                onClick = { onClick(a) },
                 label = { Text(a.name) },
-                colors = FilterChipDefaults.filterChipColors(selectedContainerColor = MaterialTheme.colorScheme.primaryContainer))
+                colors = FilterChipDefaults.filterChipColors(selectedContainerColor = MaterialTheme.colorScheme.primaryContainer)
+            )
         }
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun WalletRow(wals: List<Wallet>, sel: Wallet?, onClick: (Wallet) -> Unit) {
-    LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        items(wals, key = { it.id }) { w ->
-            FilterChip(selected = sel?.id == w.id, onClick = { onClick(w) },
+    FlowRow(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        wals.forEach { w ->
+            FilterChip(
+                selected = sel?.id == w.id, 
+                onClick = { onClick(w) },
                 label = { Text(w.name) },
-                colors = FilterChipDefaults.filterChipColors(selectedContainerColor = MaterialTheme.colorScheme.primaryContainer))
+                colors = FilterChipDefaults.filterChipColors(selectedContainerColor = MaterialTheme.colorScheme.primaryContainer)
+            )
         }
     }
 }

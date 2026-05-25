@@ -44,6 +44,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.soren.bill.ui.theme.ExpenseRed
 import com.soren.bill.ui.theme.categoryIcon
+import androidx.compose.ui.platform.LocalContext
+import com.soren.bill.BillApplication
+import com.soren.bill.data.preferences.ThemeMode
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -61,6 +66,34 @@ fun ProfileScreen(viewModel: ProfileViewModel) {
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
+        val context = LocalContext.current
+        val app = context.applicationContext as BillApplication
+        val themeMode by app.themePreferences.themeMode.collectAsState()
+
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+            Text("外观设置", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+        }
+        SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp)) {
+            SegmentedButton(
+                selected = themeMode == ThemeMode.SYSTEM,
+                onClick = { app.themePreferences.setThemeMode(ThemeMode.SYSTEM) },
+                shape = androidx.compose.foundation.shape.RoundedCornerShape(topStart = 16.dp, bottomStart = 16.dp)
+            ) { Text("跟随系统", style = MaterialTheme.typography.labelMedium) }
+            SegmentedButton(
+                selected = themeMode == ThemeMode.LIGHT,
+                onClick = { app.themePreferences.setThemeMode(ThemeMode.LIGHT) },
+                shape = androidx.compose.foundation.shape.RoundedCornerShape(0.dp)
+            ) { Text("清新明亮", style = MaterialTheme.typography.labelMedium) }
+            SegmentedButton(
+                selected = themeMode == ThemeMode.DARK,
+                onClick = { app.themePreferences.setThemeMode(ThemeMode.DARK) },
+                shape = androidx.compose.foundation.shape.RoundedCornerShape(topEnd = 16.dp, bottomEnd = 16.dp)
+            ) { Text("深邃暗黑", style = MaterialTheme.typography.labelMedium) }
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+        HorizontalDivider()
+        Spacer(modifier = Modifier.height(8.dp))
+
         SectionHeader(title = "钱包", onAdd = { showAddWalletDialog = true })
         uiState.wallets.forEach { wallet ->
             ManageableItem(
@@ -254,3 +287,4 @@ fun AddItemDialog(
         }
     )
 }
+

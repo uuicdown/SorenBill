@@ -1,0 +1,299 @@
+Initialized native services in: C:\Users\rony\.gradle\native
+Initialized jansi services in: C:\Users\rony\.gradle\native
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.4.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Starting process 'Gradle build daemon'. Working directory: C:\Users\rony\.gradle\daemon\9.4.1 Command: E:\CODE\jdk-17.0.1\bin\java.exe --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.lang.invoke=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.prefs/java.util.prefs=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.prefs/java.util.prefs=ALL-UNNAMED --add-opens=java.base/java.nio.charset=ALL-UNNAMED --add-opens=java.base/java.net=ALL-UNNAMED --add-opens=java.base/java.util.concurrent=ALL-UNNAMED --add-opens=java.base/java.util.concurrent.atomic=ALL-UNNAMED --add-opens=java.xml/javax.xml.namespace=ALL-UNNAMED --add-opens=java.base/java.time=ALL-UNNAMED -XX:+UseParallelGC -Xmx4096m -Dfile.encoding=UTF-8 -Duser.country=CN -Duser.language=zh -Duser.variant -cp C:\Users\rony\AppData\Local\Temp\opencode\gradle\gradle-9.4.1\lib\gradle-daemon-main-9.4.1.jar -javaagent:C:\Users\rony\AppData\Local\Temp\opencode\gradle\gradle-9.4.1\lib\agents\gradle-instrumentation-agent-9.4.1.jar org.gradle.launcher.daemon.bootstrap.GradleDaemon 9.4.1
+Successfully started process 'Gradle build daemon'
+An attempt to start the daemon took 4.407 secs.
+The client will now receive all logging from the daemon (pid: 3828). The daemon log file: C:\Users\rony\.gradle\daemon\9.4.1\daemon-3828.out.log
+Daemon will be stopped at the end of the build 
+Using 16 worker leases.
+Operational build model parameters: {cachingModelBuilding=false, configurationCache=false, configurationCacheDisabledReason=null, configurationCacheParallelLoad=false, configurationCacheParallelStore=false, configureOnDemand=false, invalidateCoupledProjects=false, isolatedProjects=false, modelAsProjectDependency=false, modelBuilding=false, parallelModelBuilding=false, parallelProjectConfiguration=false, parallelProjectExecution=true, resilientModelBuilding=false}
+Received JVM installation metadata from 'E:\CODE\jdk-17.0.1': {JAVA_HOME=E:\CODE\jdk-17.0.1, JAVA_VERSION=17.0.1, JAVA_VENDOR=Oracle Corporation, RUNTIME_NAME=OpenJDK Runtime Environment, RUNTIME_VERSION=17.0.1+12-39, VM_NAME=OpenJDK 64-Bit Server VM, VM_VERSION=17.0.1+12-39, VM_VENDOR=Oracle Corporation, OS_ARCH=amd64}
+Watching the file system is configured to be enabled if available
+Now considering [D:\Desktop\OH-WorkSpace\SorenBill] as hierarchies to watch
+File system watching is active
+Starting Build
+Settings evaluated using settings file 'D:\Desktop\OH-WorkSpace\SorenBill\settings.gradle.kts'.
+Using local directory build cache for the root build (location = C:\Users\rony\.gradle\caches\build-cache-1, remove unused entries = after 7 days).
+Projects loaded. Root project using build file 'D:\Desktop\OH-WorkSpace\SorenBill\build.gradle.kts'.
+Included projects: [root project 'SorenBill', project ':app']
+
+> Configure project :
+Evaluating root project 'SorenBill' using build file 'D:\Desktop\OH-WorkSpace\SorenBill\build.gradle.kts'.
+Resolved plugin [id: 'com.android.application', version: '9.2.1', apply: false]
+Resolved plugin [id: 'org.jetbrains.kotlin.android', version: '2.2.10', apply: false]
+Resolved plugin [id: 'com.google.devtools.ksp', version: '2.2.10-2.0.2', apply: false]
+Resolved plugin [id: 'org.jetbrains.kotlin.plugin.compose', version: '2.2.10', apply: false]
+
+> Configure project :app
+Evaluating project ':app' using build file 'D:\Desktop\OH-WorkSpace\SorenBill\app\build.gradle.kts'.
+Resolved plugin [id: 'com.android.application']
+Resolved plugin [id: 'com.google.devtools.ksp']
+Resolved plugin [id: 'org.jetbrains.kotlin.plugin.compose']
+WARNING: The option setting 'android.disallowKotlinSourceSets=false' is experimental.
+The current default is 'true'.
+Build d3038a0a-5683-4054-9b4f-744fc9791a13 is started
+Using default execution profile
+Detected Android Gradle Plugin compose compiler configuration
+Detected Android Gradle Plugin compose compiler configuration
+Detected Android Gradle Plugin compose compiler configuration
+Detected Android Gradle Plugin compose compiler configuration
+All projects evaluated.
+Task path ':app:testDebugUnitTest' matched project ':app'
+Task name matched 'testDebugUnitTest'
+Selected primary task 'testDebugUnitTest' from project :app
+Adding -Xuse-inline-scopes-numbers Kotlin compiler flag for task :app:compileDebugKotlin
+Tasks to be executed: [task ':app:preBuild', task ':app:preDebugBuild', task ':app:generateDebugResources', task ':app:packageDebugResources', task ':app:processDebugNavigationResources', task ':app:parseDebugLocalResources', task ':app:generateDebugRFile', task ':app:kspDebugKotlin', task ':app:compileDebugKotlin', task ':app:javaPreCompileDebug', task ':app:compileDebugJavaWithJavac', task ':app:checkDebugAarMetadata', task ':app:mapDebugSourceSetPaths', task ':app:compileDebugNavigationResources', task ':app:mergeDebugResources', task ':app:createDebugCompatibleScreenManifests', task ':app:extractDeepLinksDebug', task ':app:processDebugMainManifest', task ':app:processDebugManifest', task ':app:processDebugManifestForPackage', task ':app:processDebugResources', task ':app:bundleDebugClassesToRuntimeJar', task ':app:bundleDebugClassesToCompileJar', task ':app:kspDebugUnitTestKotlin', task ':app:preDebugUnitTestBuild', task ':app:compileDebugUnitTestKotlin', task ':app:javaPreCompileDebugUnitTest', task ':app:compileDebugUnitTestJavaWithJavac', task ':app:processDebugJavaRes', task ':app:processDebugUnitTestJavaRes', task ':app:testDebugUnitTest']
+Tasks that were excluded: []
+Resolve mutations for :app:preBuild (Thread[Execution worker Thread 2,5,main]) started.
+:app:preBuild (Thread[Execution worker Thread 2,5,main]) started.
+
+> Task :app:preBuild UP-TO-DATE
+Skipping task ':app:preBuild' as it has no actions.
+Resolve mutations for :app:preDebugBuild (Thread[Execution worker Thread 2,5,main]) started.
+:app:preDebugBuild (Thread[Execution worker Thread 2,5,main]) started.
+
+> Task :app:preDebugBuild UP-TO-DATE
+Skipping task ':app:preDebugBuild' as it has no actions.
+Resolve mutations for :app:generateDebugResources (Thread[Execution worker Thread 2,5,main]) started.
+:app:generateDebugResources (Thread[Execution worker Thread 2,5,main]) started.
+
+> Task :app:generateDebugResources UP-TO-DATE
+Build cache key for task ':app:generateDebugResources' is 4033adf243505dd9a757ce93769960d8
+Skipping task ':app:generateDebugResources' as it is up-to-date.
+Resolve mutations for :app:packageDebugResources (Thread[Execution worker Thread 2,5,main]) started.
+:app:packageDebugResources (Thread[Execution worker Thread 2,5,main]) started.
+
+> Task :app:packageDebugResources UP-TO-DATE
+Build cache key for task ':app:packageDebugResources' is 46509e993a0d19bfa310463705498cc7
+Skipping task ':app:packageDebugResources' as it is up-to-date.
+Resolve mutations for :app:processDebugNavigationResources (Thread[Execution worker Thread 2,5,main]) started.
+:app:processDebugNavigationResources (Thread[Execution worker Thread 2,5,main]) started.
+
+> Task :app:processDebugNavigationResources UP-TO-DATE
+Build cache key for task ':app:processDebugNavigationResources' is fef3ae6a49d42a246b888808d310f907
+Skipping task ':app:processDebugNavigationResources' as it is up-to-date.
+Resolve mutations for :app:parseDebugLocalResources (Thread[Execution worker Thread 2,5,main]) started.
+:app:parseDebugLocalResources (Thread[Execution worker Thread 2,5,main]) started.
+
+> Task :app:parseDebugLocalResources UP-TO-DATE
+Build cache key for task ':app:parseDebugLocalResources' is 1d4b6acf80cc16703b4c5a8aef7ac04e
+Skipping task ':app:parseDebugLocalResources' as it is up-to-date.
+Resolve mutations for :app:generateDebugRFile (Thread[Execution worker Thread 2,5,main]) started.
+:app:generateDebugRFile (Thread[Execution worker Thread 2,5,main]) started.
+
+> Task :app:generateDebugRFile UP-TO-DATE
+Build cache key for task ':app:generateDebugRFile' is 478fb1a7b4d76f7667975d1cea6f4f49
+Skipping task ':app:generateDebugRFile' as it is up-to-date.
+Resolve mutations for :app:kspDebugKotlin (Thread[Execution worker Thread 2,5,main]) started.
+:app:kspDebugKotlin (Thread[Execution worker Thread 2,5,main]) started.
+Resolve mutations for :app:javaPreCompileDebug (Thread[Execution worker Thread 4,5,main]) started.
+:app:javaPreCompileDebug (Thread[Execution worker Thread 4,5,main]) started.
+
+> Task :app:javaPreCompileDebug UP-TO-DATE
+Build cache key for task ':app:javaPreCompileDebug' is b4c5dfe5599f15345277ed67132fc2f4
+Skipping task ':app:javaPreCompileDebug' as it is up-to-date.
+Resolve mutations for :app:checkDebugAarMetadata (Thread[Execution worker Thread 4,5,main]) started.
+:app:checkDebugAarMetadata (Thread[Execution worker Thread 4,5,main]) started.
+
+> Task :app:checkDebugAarMetadata UP-TO-DATE
+Caching disabled for task ':app:checkDebugAarMetadata' because:
+  Caching has been disabled for the task
+Skipping task ':app:checkDebugAarMetadata' as it is up-to-date.
+Resolve mutations for :app:mapDebugSourceSetPaths (Thread[Execution worker Thread 3,5,main]) started.
+:app:mapDebugSourceSetPaths (Thread[Execution worker Thread 4,5,main]) started.
+
+> Task :app:mapDebugSourceSetPaths UP-TO-DATE
+Caching disabled for task ':app:mapDebugSourceSetPaths' because:
+  Caching has been disabled for the task
+Skipping task ':app:mapDebugSourceSetPaths' as it is up-to-date.
+Resolve mutations for :app:compileDebugNavigationResources (Thread[Execution worker Thread 4,5,main]) started.
+:app:compileDebugNavigationResources (Thread[Execution worker Thread 4,5,main]) started.
+
+> Task :app:compileDebugNavigationResources UP-TO-DATE
+Build cache key for task ':app:compileDebugNavigationResources' is 04e122cbafdef69c65e612aa7adb4757
+Skipping task ':app:compileDebugNavigationResources' as it is up-to-date.
+Resolve mutations for :app:mergeDebugResources (Thread[Execution worker Thread 4,5,main]) started.
+:app:mergeDebugResources (Thread[Execution worker Thread 4,5,main]) started.
+
+> Task :app:mergeDebugResources UP-TO-DATE
+Build cache key for task ':app:mergeDebugResources' is a38f2b51701fd0c870f3b6ab7137f4e7
+Skipping task ':app:mergeDebugResources' as it is up-to-date.
+Resolve mutations for :app:createDebugCompatibleScreenManifests (Thread[Execution worker Thread 4,5,main]) started.
+:app:createDebugCompatibleScreenManifests (Thread[Execution worker Thread 4,5,main]) started.
+
+> Task :app:createDebugCompatibleScreenManifests UP-TO-DATE
+Caching disabled for task ':app:createDebugCompatibleScreenManifests' because:
+  Caching has been disabled for the task
+Skipping task ':app:createDebugCompatibleScreenManifests' as it is up-to-date.
+Resolve mutations for :app:extractDeepLinksDebug (Thread[Execution worker Thread 4,5,main]) started.
+:app:extractDeepLinksDebug (Thread[Execution worker Thread 4,5,main]) started.
+
+> Task :app:extractDeepLinksDebug UP-TO-DATE
+Build cache key for task ':app:extractDeepLinksDebug' is a3d76e4174231915c0456992ad6be9dc
+Skipping task ':app:extractDeepLinksDebug' as it is up-to-date.
+Resolve mutations for :app:processDebugMainManifest (Thread[Execution worker Thread 14,5,main]) started.
+:app:processDebugMainManifest (Thread[Execution worker Thread 14,5,main]) started.
+
+> Task :app:processDebugMainManifest UP-TO-DATE
+Build cache key for task ':app:processDebugMainManifest' is f73bb6419fb24d31c8d703aff0720126
+Skipping task ':app:processDebugMainManifest' as it is up-to-date.
+Resolve mutations for :app:processDebugManifest (Thread[Execution worker Thread 14,5,main]) started.
+:app:processDebugManifest (Thread[Execution worker Thread 14,5,main]) started.
+
+> Task :app:processDebugManifest UP-TO-DATE
+Build cache key for task ':app:processDebugManifest' is ae706643d6aff0682ab1518b1bc274e9
+Skipping task ':app:processDebugManifest' as it is up-to-date.
+Resolve mutations for :app:processDebugManifestForPackage (Thread[Execution worker Thread 14,5,main]) started.
+:app:processDebugManifestForPackage (Thread[Execution worker Thread 14,5,main]) started.
+
+> Task :app:processDebugManifestForPackage UP-TO-DATE
+Custom actions are attached to task ':app:processDebugManifestForPackage'.
+Build cache key for task ':app:processDebugManifestForPackage' is 247439fa30b045ebbf9beeb936743bab
+Skipping task ':app:processDebugManifestForPackage' as it is up-to-date.
+Resolve mutations for :app:processDebugResources (Thread[Execution worker Thread 14,5,main]) started.
+:app:processDebugResources (Thread[Execution worker Thread 14,5,main]) started.
+
+> Task :app:processDebugResources UP-TO-DATE
+Build cache key for task ':app:processDebugResources' is 906bf0895b946df00ea628fae5d45e7c
+Skipping task ':app:processDebugResources' as it is up-to-date.
+Resolve mutations for :app:preDebugUnitTestBuild (Thread[Execution worker Thread 14,5,main]) started.
+:app:preDebugUnitTestBuild (Thread[Execution worker Thread 14,5,main]) started.
+
+> Task :app:preDebugUnitTestBuild UP-TO-DATE
+Skipping task ':app:preDebugUnitTestBuild' as it has no actions.
+Resolve mutations for :app:javaPreCompileDebugUnitTest (Thread[Execution worker Thread 14,5,main]) started.
+:app:javaPreCompileDebugUnitTest (Thread[Execution worker Thread 14,5,main]) started.
+
+> Task :app:javaPreCompileDebugUnitTest UP-TO-DATE
+Build cache key for task ':app:javaPreCompileDebugUnitTest' is 0a358bab8c83821857587e49fa93ff75
+Skipping task ':app:javaPreCompileDebugUnitTest' as it is up-to-date.
+
+> Task :app:kspDebugKotlin
+Build cache key for task ':app:kspDebugKotlin' is 8067f065fadb53d98456352b11c3fdf3
+Task ':app:kspDebugKotlin' is not up-to-date because:
+  Value of input property 'kspConfig.logLevel' has changed for task ':app:kspDebugKotlin'
+The input changes require a full rebuild for incremental task ':app:kspDebugKotlin'.
+file or directory 'D:\Desktop\OH-WorkSpace\SorenBill\app\src\main\kotlin', not found
+file or directory 'D:\Desktop\OH-WorkSpace\SorenBill\app\src\debug\java', not found
+file or directory 'D:\Desktop\OH-WorkSpace\SorenBill\app\src\debug\kotlin', not found
+file or directory 'D:\Desktop\OH-WorkSpace\SorenBill\app\src\main\kotlin', not found
+file or directory 'D:\Desktop\OH-WorkSpace\SorenBill\app\src\debug\java', not found
+file or directory 'D:\Desktop\OH-WorkSpace\SorenBill\app\src\debug\kotlin', not found
+i: [ksp] loaded provider(s): [androidx.room.RoomKspProcessor$Provider]
+Stored cache entry for task ':app:kspDebugKotlin' with cache key 8067f065fadb53d98456352b11c3fdf3
+Resolve mutations for :app:compileDebugKotlin (Thread[Execution worker Thread 2,5,main]) started.
+:app:compileDebugKotlin (Thread[Execution worker Thread 2,5,main]) started.
+
+> Task :app:compileDebugKotlin UP-TO-DATE
+file or directory 'D:\Desktop\OH-WorkSpace\SorenBill\app\src\main\kotlin', not found
+file or directory 'D:\Desktop\OH-WorkSpace\SorenBill\app\src\debug\java', not found
+file or directory 'D:\Desktop\OH-WorkSpace\SorenBill\app\src\debug\kotlin', not found
+file or directory 'D:\Desktop\OH-WorkSpace\SorenBill\app\src\debug\java', not found
+file or directory 'D:\Desktop\OH-WorkSpace\SorenBill\app\src\main\kotlin', not found
+file or directory 'D:\Desktop\OH-WorkSpace\SorenBill\app\src\debug\java', not found
+file or directory 'D:\Desktop\OH-WorkSpace\SorenBill\app\src\debug\kotlin', not found
+file or directory 'D:\Desktop\OH-WorkSpace\SorenBill\app\src\debug\java', not found
+file or directory 'D:\Desktop\OH-WorkSpace\SorenBill\app\src\main\kotlin', not found
+file or directory 'D:\Desktop\OH-WorkSpace\SorenBill\app\src\debug\java', not found
+file or directory 'D:\Desktop\OH-WorkSpace\SorenBill\app\src\debug\kotlin', not found
+file or directory 'D:\Desktop\OH-WorkSpace\SorenBill\app\src\debug\java', not found
+Custom actions are attached to task ':app:compileDebugKotlin'.
+Build cache key for task ':app:compileDebugKotlin' is 872dc0e2b103c42ef61ba1fbe49dad8e
+Skipping task ':app:compileDebugKotlin' as it is up-to-date.
+Resolve mutations for :app:compileDebugJavaWithJavac (Thread[Execution worker Thread 2,5,main]) started.
+:app:compileDebugJavaWithJavac (Thread[Execution worker Thread 2,5,main]) started.
+
+> Task :app:compileDebugJavaWithJavac NO-SOURCE
+Skipping task ':app:compileDebugJavaWithJavac' as it has no source files and no previous output files.
+Resolve mutations for :app:bundleDebugClassesToRuntimeJar (Thread[Execution worker Thread 2,5,main]) started.
+:app:bundleDebugClassesToRuntimeJar (Thread[Execution worker Thread 2,5,main]) started.
+
+> Task :app:bundleDebugClassesToRuntimeJar UP-TO-DATE
+Caching disabled for task ':app:bundleDebugClassesToRuntimeJar' because:
+  Caching has been disabled for the task
+Skipping task ':app:bundleDebugClassesToRuntimeJar' as it is up-to-date.
+work action resolve classes.jar (project :app) (Thread[Execution worker Thread 2,5,main]) started.
+Resolve mutations for :app:bundleDebugClassesToCompileJar (Thread[Execution worker Thread 2,5,main]) started.
+:app:bundleDebugClassesToCompileJar (Thread[Execution worker Thread 2,5,main]) started.
+
+> Task :app:bundleDebugClassesToCompileJar UP-TO-DATE
+Caching disabled for task ':app:bundleDebugClassesToCompileJar' because:
+  Caching has been disabled for the task
+Skipping task ':app:bundleDebugClassesToCompileJar' as it is up-to-date.
+work action resolve classes.jar (project :app) (Thread[Execution worker Thread 2,5,main]) started.
+Resolve mutations for :app:kspDebugUnitTestKotlin (Thread[Execution worker Thread 2,5,main]) started.
+:app:kspDebugUnitTestKotlin (Thread[Execution worker Thread 2,5,main]) started.
+Resolve mutations for :app:processDebugJavaRes (Thread[Execution worker,5,main]) started.
+:app:processDebugJavaRes (Thread[Execution worker,5,main]) started.
+
+> Task :app:processDebugJavaRes UP-TO-DATE
+file or directory 'D:\Desktop\OH-WorkSpace\SorenBill\app\src\main\resources', not found
+file or directory 'D:\Desktop\OH-WorkSpace\SorenBill\app\src\debug\resources', not found
+Caching disabled for task ':app:processDebugJavaRes' because:
+  Caching has been disabled for the task
+Skipping task ':app:processDebugJavaRes' as it is up-to-date.
+work action resolve out (project :app) (Thread[Execution worker,5,main]) started.
+
+> Task :app:kspDebugUnitTestKotlin
+Build cache key for task ':app:kspDebugUnitTestKotlin' is 6b1ad213a389f3fe6253a68824ab39ee
+Task ':app:kspDebugUnitTestKotlin' is not up-to-date because:
+  Value of input property 'kspConfig.logLevel' has changed for task ':app:kspDebugUnitTestKotlin'
+The input changes require a full rebuild for incremental task ':app:kspDebugUnitTestKotlin'.
+file or directory 'D:\Desktop\OH-WorkSpace\SorenBill\app\src\test\kotlin', not found
+file or directory 'D:\Desktop\OH-WorkSpace\SorenBill\app\src\testDebug\java', not found
+file or directory 'D:\Desktop\OH-WorkSpace\SorenBill\app\src\testDebug\kotlin', not found
+file or directory 'D:\Desktop\OH-WorkSpace\SorenBill\app\src\test\kotlin', not found
+file or directory 'D:\Desktop\OH-WorkSpace\SorenBill\app\src\testDebug\java', not found
+file or directory 'D:\Desktop\OH-WorkSpace\SorenBill\app\src\testDebug\kotlin', not found
+i: [ksp] loaded provider(s): [androidx.room.RoomKspProcessor$Provider]
+Stored cache entry for task ':app:kspDebugUnitTestKotlin' with cache key 6b1ad213a389f3fe6253a68824ab39ee
+Resolve mutations for :app:compileDebugUnitTestKotlin (Thread[Execution worker Thread 2,5,main]) started.
+:app:compileDebugUnitTestKotlin (Thread[Execution worker Thread 2,5,main]) started.
+
+> Task :app:compileDebugUnitTestKotlin UP-TO-DATE
+file or directory 'D:\Desktop\OH-WorkSpace\SorenBill\app\src\test\kotlin', not found
+file or directory 'D:\Desktop\OH-WorkSpace\SorenBill\app\src\testDebug\java', not found
+file or directory 'D:\Desktop\OH-WorkSpace\SorenBill\app\src\testDebug\kotlin', not found
+file or directory 'D:\Desktop\OH-WorkSpace\SorenBill\app\src\testDebug\java', not found
+file or directory 'D:\Desktop\OH-WorkSpace\SorenBill\app\src\test\kotlin', not found
+file or directory 'D:\Desktop\OH-WorkSpace\SorenBill\app\src\testDebug\java', not found
+file or directory 'D:\Desktop\OH-WorkSpace\SorenBill\app\src\testDebug\kotlin', not found
+file or directory 'D:\Desktop\OH-WorkSpace\SorenBill\app\src\testDebug\java', not found
+file or directory 'D:\Desktop\OH-WorkSpace\SorenBill\app\src\test\kotlin', not found
+file or directory 'D:\Desktop\OH-WorkSpace\SorenBill\app\src\testDebug\java', not found
+file or directory 'D:\Desktop\OH-WorkSpace\SorenBill\app\src\testDebug\kotlin', not found
+file or directory 'D:\Desktop\OH-WorkSpace\SorenBill\app\src\testDebug\java', not found
+Custom actions are attached to task ':app:compileDebugUnitTestKotlin'.
+Build cache key for task ':app:compileDebugUnitTestKotlin' is 0ec4b41ee427f0d115b56aa4671ab8d9
+Skipping task ':app:compileDebugUnitTestKotlin' as it is up-to-date.
+Resolve mutations for :app:compileDebugUnitTestJavaWithJavac (Thread[Execution worker Thread 2,5,main]) started.
+:app:compileDebugUnitTestJavaWithJavac (Thread[Execution worker Thread 2,5,main]) started.
+
+> Task :app:compileDebugUnitTestJavaWithJavac NO-SOURCE
+Skipping task ':app:compileDebugUnitTestJavaWithJavac' as it has no source files and no previous output files.
+Resolve mutations for :app:processDebugUnitTestJavaRes (Thread[Execution worker Thread 2,5,main]) started.
+:app:processDebugUnitTestJavaRes (Thread[Execution worker Thread 2,5,main]) started.
+
+> Task :app:processDebugUnitTestJavaRes UP-TO-DATE
+file or directory 'D:\Desktop\OH-WorkSpace\SorenBill\app\src\test\resources', not found
+file or directory 'D:\Desktop\OH-WorkSpace\SorenBill\app\src\testDebug\resources', not found
+Caching disabled for task ':app:processDebugUnitTestJavaRes' because:
+  Caching has been disabled for the task
+Skipping task ':app:processDebugUnitTestJavaRes' as it is up-to-date.
+Resolve mutations for :app:testDebugUnitTest (Thread[Execution worker Thread 2,5,main]) started.
+:app:testDebugUnitTest (Thread[Execution worker Thread 2,5,main]) started.
+
+> Task :app:testDebugUnitTest FAILED
+Build cache key for task ':app:testDebugUnitTest' is 3f77c53f9a65c08cfa04f40d88b13faa
+Task ':app:testDebugUnitTest' is not up-to-date because:
+  Task has failed previously.
+file or directory 'D:\Desktop\OH-WorkSpace\SorenBill\app\build\intermediates\javac\debugUnitTest\compileDebugUnitTestJavaWithJavac\classes', not found
+Starting process 'Gradle Test Executor 1'. Working directory: D:\Desktop\OH-WorkSpace\SorenBill\app Command: E:\CODE\jdk-17.0.1\bin\java.exe -Djava.awt.headless=true -Djava.library.path=E:\CODE\jdk-17.0.1\bin;C:\Windows\Sun\Java\bin;C:\Windows\system32;C:\Windows;C:\Program Files\WindowsApps\Microsoft.PowerShell_7.6.2.0_x64__8wekyb3d8bbwe;E:\NETWORK\Vmware\bin\;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.6\bin;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.6\libnvvp;"C:\Program Files (x86)\Common Files\Intel\Shared Libraries\redist\intel64\compiler;E:\CODE\jdk-17.0.1";C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;%MINGW64_HOME%;C:\Program Files\MySQL\MySQL Server 8.3;C:\Program Files (x86)\dotnet\;E:\CODE\jdk-17.0.1\bin;C:\Program Files\dotnet\;C:\Program Files\MySQL\MySQL Server 8.3\bin;C:\Program Files\NVIDIA Corporation\Nsight Compute 2024.3.2\;E:\CODE\Git\Git\cmd;C:\Windows\System32\Wbem;E:\NETWORK\Xshell\;C:\Program Files\Docker\Docker\resources\bin;C:\Program Files\NVIDIA Corporation\NVIDIA App\NvDLISR;E:\CODE\redis\Redis-8.2.3-Windows-x64-cygwin-with-Service;C:\Users\rony\AppData\Local\nvm;C:\nvm4w\nodejs;E:\NETWORK\Xftp\;C:\Windows;E:\CODE\python3.10\Scripts;E:\CODE\python3.10;C:\Users\rony\AppData\Local\Microsoft\WindowsApps;E:\CODE\MinGW-w64\mingw64\bin;E:\CODE\Microsoft VS Code\bin;E:\CODE\pycharm\PyCharm Community Edition 2022.1.2\bin;C:\Users\rony\AppData\Local\spicetify;C:\Windows\System32\Wbem;E:\CODE\IDEA\IntelliJ IDEA 2025.3.3\bin;E:\CODE\maven\apache-maven-3.9.14\bin;E:\CODE\Nacos\nacos\bin;C:\Users\rony\AppData\Local\Microsoft\WinGet\Links;C:\Users\rony\.bun\bin;C:\Users\rony\AppData\Local\nvm;C:\nvm4w\nodejs;;.;D:\Desktop\OH-WorkSpace\SorenBill\app\src\testDebug\jniLibs;D:\Desktop\OH-WorkSpace\SorenBill\app\src\test\jniLibs -Dorg.gradle.internal.worker.tmpdir=D:\Desktop\OH-WorkSpace\SorenBill\app\build\tmp\testDebugUnitTest\work --add-opens=java.base/java.io=ALL-UNNAMED @C:\Users\rony\.gradle\.tmp\gradle-worker-classpath8709538080605045382txt -Xmx512m -Dfile.encoding=UTF-8 -Duser.country=CN -Duser.language=zh -Duser.variant -ea worker.org.gradle.process.internal.worker.GradleWorkerMain 'Gradle Test Executor 1'
+Successfully started process 'Gradle Test Executor 1'
+Generating HTML test report...
+Finished generating test html results (0.024 secs) into: D:\Desktop\OH-WorkSpace\SorenBill\app\build\reports\tests\testDebugUnitTest
+Finished generating test XML results (0.001 secs) into: D:\Desktop\OH-WorkSpace\SorenBill\app\build\test-results\testDebugUnitTest
+Build d3038a0a-5683-4054-9b4f-744fc9791a13 is closed
+26 actionable tasks: 3 executed, 23 up-to-date
+Watched directory hierarchies: [D:\Desktop\OH-WorkSpace\SorenBill]

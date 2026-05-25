@@ -61,7 +61,7 @@ fun AssetsScreen(viewModel: AssetsViewModel) {
                             value = uiState.selectedWalletName,
                             onValueChange = {}, readOnly = true,
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = walletExp) },
-                            modifier = Modifier.width(140.dp).menuAnchor(),
+                            modifier = Modifier.width(140.dp).menuAnchor(MenuAnchorType.PrimaryNotEditable, true),
                             textStyle = MaterialTheme.typography.bodySmall
                         )
                         ExposedDropdownMenu(expanded = walletExp, onDismissRequest = { walletExp = false }) {
@@ -84,7 +84,7 @@ fun AssetsScreen(viewModel: AssetsViewModel) {
         }
         SnackbarHost(hostState = snackbarHostState, modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 80.dp))
         FloatingActionButton(onClick = { showAdd = true }, containerColor = MaterialTheme.colorScheme.primary,
-            contentColor = MaterialTheme.colorScheme.onPrimary, shape = CircleShape,
+            contentColor = MaterialTheme.colorScheme.onPrimary, shape = CircleShape, elevation = FloatingActionButtonDefaults.elevation(0.dp, 0.dp, 0.dp, 0.dp),
             modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp)) { Icon(Icons.Default.Add, "添加") }
     }
     if (showAdd) AddDialog(onDismiss = { showAdd = false }, onConfirm = { n, t, l, d, b -> viewModel.addAccount(n, t, l, d, b); showAdd = false; snackMsg = "已添加「$n」" })

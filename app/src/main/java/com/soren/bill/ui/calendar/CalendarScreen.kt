@@ -102,6 +102,10 @@ fun CalendarScreen(viewModel: CalendarViewModel) {
                         }
                     }
                 }
+                val remaining = 7 - (end - start)
+                for (i in 0 until remaining) {
+                    Spacer(Modifier.weight(1f))
+                }
             }
         }
 
