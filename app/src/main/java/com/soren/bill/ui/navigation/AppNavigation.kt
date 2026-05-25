@@ -18,10 +18,10 @@ import com.soren.bill.ui.add.AddTransactionScreen
 import com.soren.bill.ui.add.AddTransactionViewModel
 import com.soren.bill.ui.assets.AssetsScreen
 import com.soren.bill.ui.assets.AssetsViewModel
-import com.soren.bill.ui.calendar.CalendarScreen
-import com.soren.bill.ui.calendar.CalendarViewModel
 import com.soren.bill.ui.home.HomeScreen
 import com.soren.bill.ui.home.HomeViewModel
+import com.soren.bill.ui.insights.InsightsScreen
+import com.soren.bill.ui.insights.InsightsViewModel
 import com.soren.bill.ui.profile.ProfileScreen
 import com.soren.bill.ui.profile.ProfileViewModel
 import com.soren.bill.ui.stats.StatsScreen
@@ -35,12 +35,12 @@ sealed class Screen(
     val selectedIcon: ImageVector
 ) {
     object Home : Screen("home", "\u6d41\u6c34", Icons.Outlined.Home, Icons.Filled.Home)
-    object Calendar : Screen("calendar", "\u65e5\u5386", Icons.Outlined.CalendarMonth, Icons.Filled.CalendarMonth)
+    object Insights : Screen("insights", "\u5206\u6790", Icons.Outlined.Insights, Icons.Filled.Insights)
     object Assets : Screen("assets", "\u8d44\u4ea7", Icons.Outlined.AccountBalanceWallet, Icons.Filled.AccountBalanceWallet)
-    object Profile : Screen("profile", "Soren", Icons.Outlined.Person, Icons.Filled.Person)
+    object Profile : Screen("profile", "\u6211\u7684", Icons.Outlined.Person, Icons.Filled.Person)
 }
 
-val bottomNavItems = listOf(Screen.Home, Screen.Calendar, Screen.Assets, Screen.Profile)
+val bottomNavItems = listOf(Screen.Home, Screen.Insights, Screen.Assets, Screen.Profile)
 
 @Composable
 fun AppNavigation() {
@@ -89,9 +89,9 @@ fun AppNavigation() {
                 )
             }
 
-            composable(Screen.Calendar.route) {
-                val vm: CalendarViewModel = koinViewModel()
-                CalendarScreen(viewModel = vm)
+            composable(Screen.Insights.route) {
+                val vm: InsightsViewModel = koinViewModel()
+                InsightsScreen(viewModel = vm)
             }
 
             composable(Screen.Assets.route) {
