@@ -10,6 +10,9 @@ import com.soren.bill.ui.home.HomeViewModel
 import com.soren.bill.ui.profile.ProfileViewModel
 import com.soren.bill.ui.stats.StatsViewModel
 import com.soren.bill.ui.insights.InsightsViewModel
+import com.soren.bill.ui.category.CategoryViewModel
+import com.soren.bill.ui.wallets.WalletViewModel
+import com.soren.bill.ui.accounts.AccountViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
@@ -35,6 +38,9 @@ val appModule = module {
     viewModel { HomeViewModel(get()) }
     viewModel { StatsViewModel(get()) }
     viewModel { InsightsViewModel(get()) }
+    viewModel { CategoryViewModel(get()) }
+    viewModel { WalletViewModel(get()) }
+    viewModel { AccountViewModel(get()) }
     viewModel { CalendarViewModel(get()) }
     viewModel { AssetsViewModel(get()) }
     viewModel { ProfileViewModel(get()) }
