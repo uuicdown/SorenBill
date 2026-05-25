@@ -34,10 +34,10 @@ sealed class Screen(
     val icon: ImageVector,
     val selectedIcon: ImageVector
 ) {
-    object Home : Screen("home", "首页", Icons.Outlined.Home, Icons.Filled.Home)
-    object Calendar : Screen("calendar", "日历", Icons.Outlined.CalendarMonth, Icons.Filled.CalendarMonth)
-    object Assets : Screen("assets", "资产", Icons.Outlined.AccountBalanceWallet, Icons.Filled.AccountBalanceWallet)
-    object Profile : Screen("profile", "我的", Icons.Outlined.Person, Icons.Filled.Person)
+    object Home : Screen("home", "\u6d41\u6c34", Icons.Outlined.Home, Icons.Filled.Home)
+    object Calendar : Screen("calendar", "\u65e5\u5386", Icons.Outlined.CalendarMonth, Icons.Filled.CalendarMonth)
+    object Assets : Screen("assets", "\u8d44\u4ea7", Icons.Outlined.AccountBalanceWallet, Icons.Filled.AccountBalanceWallet)
+    object Profile : Screen("profile", "Soren", Icons.Outlined.Person, Icons.Filled.Person)
 }
 
 val bottomNavItems = listOf(Screen.Home, Screen.Calendar, Screen.Assets, Screen.Profile)

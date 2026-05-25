@@ -46,25 +46,25 @@ fun HomeScreen(viewModel: HomeViewModel, onAddClick: () -> Unit, onStatsClick: (
                     Icon(Icons.AutoMirrored.Filled.ReceiptLong, null, Modifier.size(56.dp), tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f))
                 }
                 Spacer(Modifier.height(24.dp))
-                Text("本月暂无收支记录", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.SemiBold)
+                Text("\u8fd9\u4e2a\u6708\u8fd8\u6ca1\u5f00\u59cb\u8bb0\u8d26\u5462\uff5e", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.SemiBold)
                 Spacer(Modifier.height(8.dp))
-                Text("点击右下角按钮记一笔", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text("Soren \u5728\u7b49\u60a8\u7684\u7b2c\u4e00\u7b14\u8bb0\u5f55", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             } else LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)) {
                 items(uiState.transactions, key = { it.id }) { tx ->
-                    TxRow(tx, uiState.categoryMap[tx.categoryId] ?: "未分类") { selectedTx = tx }
+                    TxRow(tx, uiState.categoryMap[tx.categoryId] ?: "\u672a\u77e5") { selectedTx = tx }
                 }
             }
         }
         FloatingActionButton(onClick = onAddClick, containerColor = MaterialTheme.colorScheme.primary,
             contentColor = MaterialTheme.colorScheme.onPrimary, shape = CircleShape, elevation = FloatingActionButtonDefaults.elevation(0.dp, 0.dp, 0.dp, 0.dp),
-            modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp)) { Icon(Icons.Default.Add, "记一笔") }
+            modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp)) { Icon(Icons.Default.Add, "\u8bb0\u4e00\u7b14") }
             
         selectedTx?.let { tx ->
             TransactionDetailDialog(
                 tx = tx,
-                categoryName = uiState.categoryMap[tx.categoryId] ?: "未分类",
-                walletName = uiState.wallets.find { it.id == tx.walletId }?.name ?: "未知钱包",
-                accountName = uiState.accounts.find { it.id == tx.accountId }?.name ?: "未知账户",
+                categoryName = uiState.categoryMap[tx.categoryId] ?: "\u672a\u77e5",
+                walletName = uiState.wallets.find { it.id == tx.walletId }?.name ?: "\u672a\u77e5\u94b1\u5305",
+                accountName = uiState.accounts.find { it.id == tx.accountId }?.name ?: "\u672a\u77e5\u8d26\u6237",
                 onDismiss = { selectedTx = null },
                 onDelete = { 
                     viewModel.deleteTransaction(tx)
@@ -85,7 +85,7 @@ fun HomeMonthHeader(timestamp: Long, onSwitchMonth: (Long) -> Unit, onStatsClick
 
     Row(Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 4.dp, start = 4.dp, end = 4.dp), verticalAlignment = Alignment.CenterVertically) {
         IconButton(onClick = { Calendar.getInstance().apply { timeInMillis = timestamp; add(Calendar.MONTH, -1) }.let { onSwitchMonth(it.timeInMillis) } }) {
-            Icon(Icons.Default.ChevronLeft, "上月", tint = MaterialTheme.colorScheme.primary)
+            Icon(Icons.Default.ChevronLeft, "\u4e0a\u4e2a\u6708", tint = MaterialTheme.colorScheme.primary)
         }
         Text(DateUtils.formatMonth(timestamp), Modifier.weight(1f), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
         IconButton(onClick = { showPicker = true }) {
@@ -95,18 +95,18 @@ fun HomeMonthHeader(timestamp: Long, onSwitchMonth: (Long) -> Unit, onStatsClick
             }
         }
         Spacer(Modifier.width(2.dp))
-        IconButton(onClick = onStatsClick) { Icon(Icons.Default.PieChart, "统计", tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp)) }
+        IconButton(onClick = onStatsClick) { Icon(Icons.Default.PieChart, "\u7edf\u8ba1", tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp)) }
         IconButton(onClick = { Calendar.getInstance().apply { timeInMillis = timestamp; add(Calendar.MONTH, 1) }.let { onSwitchMonth(it.timeInMillis) } },
             enabled = !isThisMonth) {
-            Icon(Icons.Default.ChevronRight, "下月", tint = if (isThisMonth) Color.Transparent else MaterialTheme.colorScheme.primary)
+            Icon(Icons.Default.ChevronRight, "\u4e0b\u4e2a\u6708", tint = if (isThisMonth) Color.Transparent else MaterialTheme.colorScheme.primary)
         }
     }
 
     if (showPicker) {
         val dps = rememberDatePickerState(initialSelectedDateMillis = timestamp)
         DatePickerDialog(onDismissRequest = { showPicker = false }, confirmButton = {
-            TextButton(onClick = { dps.selectedDateMillis?.let { onSwitchMonth(it) }; showPicker = false }) { Text("跳转") }
-        }, dismissButton = { TextButton(onClick = { showPicker = false }) { Text("取消") } }) {
+            TextButton(onClick = { dps.selectedDateMillis?.let { onSwitchMonth(it) }; showPicker = false }) { Text("\u8df3\u8f6c") }
+        }, dismissButton = { TextButton(onClick = { showPicker = false }) { Text("\u53d6\u6d88") } }) {
             DatePicker(state = dps)
         }
     }
@@ -131,11 +131,11 @@ fun SummaryCard(income: Double, expense: Double) {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            SumItem("收入", income, com.soren.bill.ui.theme.IncomeGreen, Modifier.weight(1f))
+            SumItem("\u5165\u8d26", income, com.soren.bill.ui.theme.IncomeGreen, Modifier.weight(1f))
             Box(Modifier.width(1.dp).height(40.dp).background(MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.2f)))
-            SumItem("支出", expense, com.soren.bill.ui.theme.ExpenseRed, Modifier.weight(1f))
+            SumItem("\u82b1\u9500", expense, com.soren.bill.ui.theme.ExpenseRed, Modifier.weight(1f))
             Box(Modifier.width(1.dp).height(40.dp).background(MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.2f)))
-            SumItem("结余", income - expense, MaterialTheme.colorScheme.onSurface, Modifier.weight(1f))
+            SumItem("\u5269\u4f59", income - expense, MaterialTheme.colorScheme.onSurface, Modifier.weight(1f))
         }
     }
 }
@@ -180,7 +180,7 @@ fun TxRow(tx: com.soren.bill.data.entity.Transaction, categoryName: String, onCl
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(DateUtils.formatDisplayDate(tx.date), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     if (!tx.note.isNullOrBlank()) {
-                        Text(" • ", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(" \u00b7 ", color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Text(tx.note, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1)
                     }
                 }
@@ -208,7 +208,7 @@ fun TransactionDetailDialog(
     val color = if (isExpense) com.soren.bill.ui.theme.ExpenseRed else com.soren.bill.ui.theme.IncomeGreen
     val bgColor = color.copy(alpha = 0.12f)
     
-    val timeFormat = remember { java.text.SimpleDateFormat("yyyy年MM月dd日 HH:mm", java.util.Locale.CHINA) }
+    val timeFormat = remember { java.text.SimpleDateFormat("yyyy\u5e74MM\u6708dd\u65e5 HH:mm", java.util.Locale.CHINA) }
     val timeStr = remember(tx.date) { timeFormat.format(java.util.Date(tx.date)) }
 
     ModalBottomSheet(
@@ -249,23 +249,23 @@ fun TransactionDetailDialog(
                     .padding(16.dp)
             ) {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text("记录时间", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
+                    Text("\u8bb0\u5f55\u65f6\u95f4", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
                     Text(timeStr, color = MaterialTheme.colorScheme.onSurface, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium)
                 }
                 Spacer(Modifier.height(12.dp))
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text("所属钱包", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
+                    Text("\u6240\u5c5e\u94b1\u5305", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
                     Text(walletName, color = MaterialTheme.colorScheme.onSurface, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium)
                 }
                 Spacer(Modifier.height(12.dp))
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text("交易账户", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
+                    Text("\u652f\u4ed8\u8d26\u6237", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
                     Text(accountName, color = MaterialTheme.colorScheme.onSurface, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium)
                 }
                 if (!tx.note.isNullOrBlank()) {
                     Spacer(Modifier.height(12.dp))
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text("备注信息", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
+                        Text("\u5907\u6ce8\u4fe1\u606f", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
                         Text(tx.note, color = MaterialTheme.colorScheme.onSurface, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium)
                     }
                 }
@@ -281,7 +281,7 @@ fun TransactionDetailDialog(
             ) {
                 Icon(Icons.Default.Delete, contentDescription = null)
                 Spacer(Modifier.width(8.dp))
-                Text("删除此记录", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+                Text("\u5220\u9664\u6b64\u8bb0\u5f55", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
             }
         }
     }
@@ -289,16 +289,16 @@ fun TransactionDetailDialog(
     if (showDel) {
         AlertDialog(
             onDismissRequest = { showDel = false },
-            title = { Text("删除") },
-            text = { Text("确定删除？") },
+            title = { Text("\u5220\u9664\u7ed9\u5c5e") },
+            text = { Text("\u786e\u5b9a\u8981\u5220\u6389\u8fd9\u6761\u8bb0\u5f55\u5417\uff1fSoren \u4f1a\u6709\u70b9\u5fc3\u75bc\u5462") },
             confirmButton = { 
                 TextButton(onClick = { onDelete(); showDel = false }) { 
-                    Text("删除", color = com.soren.bill.ui.theme.ExpenseRed) 
+                    Text("\u5220\u9664", color = com.soren.bill.ui.theme.ExpenseRed) 
                 } 
             },
             dismissButton = { 
                 TextButton(onClick = { showDel = false }) { 
-                    Text("取消") 
+                    Text("\u53d6\u6d88") 
                 } 
             }
         )

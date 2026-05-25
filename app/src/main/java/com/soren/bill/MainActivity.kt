@@ -124,14 +124,14 @@ fun AutoAccountingConfirmationSheet(
         ) {
             // 标题
             Text(
-                "检测到新账单",
+                "\u60a8\u770b\u770b\u662f\u4e0d\u662f\u8fd9\u7b14\uff1f",
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface
             )
             Spacer(Modifier.height(4.dp))
             Text(
-                "请确认以下自动识别的账单信息",
+                "Soren \u5e2e\u60a8\u8bb0\u4e0b\u4e86\uff0c\u786e\u8ba4\u4e00\u4e0b\u5427\uff1f",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -163,16 +163,16 @@ fun AutoAccountingConfirmationSheet(
             ) {
                 Column(Modifier.padding(16.dp)) {
                     if (!info.merchant.isNullOrBlank()) {
-                        DetailRow("商户", info.merchant)
+                        DetailRow("\u5546\u6237", info.merchant)
                     }
                     if (suggestedCategory != null) {
-                        DetailRow("建议分类", suggestedCategory)
+                        DetailRow("\u63a8\u8350\u5206\u7c7b", suggestedCategory)
                     }
                     if (!info.paymentMethod.isNullOrBlank()) {
-                        DetailRow("支付方式", info.paymentMethod)
+                        DetailRow("\u652f\u4ed8\u65b9\u5f0f", info.paymentMethod)
                     }
                     if (!info.orderId.isNullOrBlank()) {
-                        DetailRow("订单号", info.orderId)
+                        DetailRow("\u8ba2\u5355\u53f7", info.orderId)
                     }
                 }
             }
@@ -191,7 +191,7 @@ fun AutoAccountingConfirmationSheet(
                 ) {
                     Icon(Icons.Default.Close, null, Modifier.size(18.dp))
                     Spacer(Modifier.width(6.dp))
-                    Text("忽略")
+                    Text("\u4e0d\u662f\u6211\u7684")
                 }
 
                 Button(
@@ -215,7 +215,7 @@ fun AutoAccountingConfirmationSheet(
                 ) {
                     Icon(Icons.Default.CheckCircle, null, Modifier.size(18.dp))
                     Spacer(Modifier.width(6.dp))
-                    Text("确认入账")
+                    Text("\u597d\u7684\uff0c\u8bb0\u4e0b\u5b83")
                 }
             }
         }
@@ -262,7 +262,7 @@ private suspend fun saveParsedTransaction(
     val accounts = repository.getAllAccounts().first()
     var accountId = accounts.firstOrNull()?.id
     if (accountId == null) {
-        repository.insertAccount(Account(name = "微信/支付宝", type = "other"))
+        repository.insertAccount(Account(name = "\u5fae\u4fe1/\u652f\u4ed8\u5b9d", type = "other"))
         accountId = repository.getAllAccounts().first().first().id
     }
 

@@ -106,7 +106,7 @@ class AutoAccountingAccessibilityService : AccessibilityService() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val title = "检测到新账单"
+        val title = "Soren 发现一笔花销～"
         val body = buildString {
             append("金额: ¥${String.format("%.2f", info.amount)}")
             if (!info.merchant.isNullOrBlank()) append("\n商户: ${info.merchant}")
@@ -150,7 +150,7 @@ class AutoAccountingAccessibilityService : AccessibilityService() {
         // 获取或创建默认钱包
         val wallets = repository.getAllWallets().first()
         val walletId = wallets.firstOrNull()?.id ?: run {
-            repository.insertWallet(Wallet(name = "默认钱包", currency = "CNY"))
+            repository.insertWallet(Wallet(name = "我的钱包", currency = "CNY"))
             repository.getAllWallets().first().first().id
         }
 
@@ -209,10 +209,10 @@ class AutoAccountingAccessibilityService : AccessibilityService() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 CHANNEL_ID,
-                "自动记账通知",
+                "Soren 自动记账",
                 NotificationManager.IMPORTANCE_HIGH
             ).apply {
-                description = "用于提醒确认自动识别的账单"
+                description = "用于提醒您确认 Soren 自动识别的账单"
             }
             val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)

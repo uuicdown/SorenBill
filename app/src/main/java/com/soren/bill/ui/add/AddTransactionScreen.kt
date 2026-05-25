@@ -1,4 +1,4 @@
-﻿package com.soren.bill.ui.add
+package com.soren.bill.ui.add
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -49,7 +49,7 @@ fun AddTransactionScreen(viewModel: AddTransactionViewModel, onNavigateBack: () 
         // Top bar
         Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onNavigateBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "返回") }
-            Text("记一笔", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+            Text("记一笔吧", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
         }
 
         Column(
@@ -59,10 +59,10 @@ fun AddTransactionScreen(viewModel: AddTransactionViewModel, onNavigateBack: () 
             // 类型
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 FilterChip(selected = uiState.type == "expense", onClick = { viewModel.setType("expense") },
-                    label = { Text("支出") }, modifier = Modifier.weight(1f),
+                    label = { Text("花销") }, modifier = Modifier.weight(1f),
                     colors = FilterChipDefaults.filterChipColors(selectedContainerColor = ExpenseRed.copy(alpha = 0.12f)))
                 FilterChip(selected = uiState.type == "income", onClick = { viewModel.setType("income") },
-                    label = { Text("收入") }, modifier = Modifier.weight(1f),
+                    label = { Text("入账") }, modifier = Modifier.weight(1f),
                     colors = FilterChipDefaults.filterChipColors(selectedContainerColor = IncomeGreen.copy(alpha = 0.12f)))
             }
 
@@ -138,7 +138,7 @@ fun AddTransactionScreen(viewModel: AddTransactionViewModel, onNavigateBack: () 
                 elevation = ButtonDefaults.buttonElevation(0.dp),
                 enabled = uiState.amount.toDoubleOrNull()?.let { it > 0 } == true
                         && uiState.selectedCategory != null && uiState.selectedAccount != null && uiState.selectedWallet != null) {
-                Text("保存", fontSize = 16.sp)
+                Text("好的，已记下", fontSize = 16.sp)
             }
             Spacer(Modifier.height(24.dp))
         }

@@ -82,7 +82,7 @@ fun ProfileScreen(viewModel: ProfileViewModel) {
                 selected = themeMode == ThemeMode.SYSTEM,
                 onClick = { coroutineScope.launch { appPreferences.setThemeMode(ThemeMode.SYSTEM) } },
                 shape = androidx.compose.foundation.shape.RoundedCornerShape(topStart = 16.dp, bottomStart = 16.dp)
-            ) { Text("跟随系统", style = MaterialTheme.typography.labelMedium) }
+            ) { Text("\u548c\u624b\u673a\u4e00\u6837", style = MaterialTheme.typography.labelMedium) }
             SegmentedButton(
                 selected = themeMode == ThemeMode.LIGHT,
                 onClick = { coroutineScope.launch { appPreferences.setThemeMode(ThemeMode.LIGHT) } },
@@ -105,7 +105,7 @@ fun ProfileScreen(viewModel: ProfileViewModel) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column {
-                Text("自动记账前确认", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                Text("\u8bb0\u8d26\u524d\u5148\u95ee\u6211\u4e00\u4e0b", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
                 Text(
                     "开启后，识别到账单时将弹窗让你确认后再保存",
                     style = MaterialTheme.typography.bodySmall,
