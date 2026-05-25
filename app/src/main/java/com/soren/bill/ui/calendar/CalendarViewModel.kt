@@ -94,3 +94,4 @@ data class DayCellInfo(
     val expense: Double,
     val dateStr: String
 )
+

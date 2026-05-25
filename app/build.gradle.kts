@@ -75,6 +75,10 @@ dependencies {
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.1")
 
+    // Koin & DataStore
+    implementation("io.insert-koin:koin-androidx-compose:3.5.6")
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
+
     // Test
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.1")

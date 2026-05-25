@@ -8,14 +8,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.soren.bill.data.repository.BillRepository
 import com.soren.bill.ui.add.AddTransactionScreen
 import com.soren.bill.ui.add.AddTransactionViewModel
 import com.soren.bill.ui.assets.AssetsScreen
@@ -28,6 +26,7 @@ import com.soren.bill.ui.profile.ProfileScreen
 import com.soren.bill.ui.profile.ProfileViewModel
 import com.soren.bill.ui.stats.StatsScreen
 import com.soren.bill.ui.stats.StatsViewModel
+import org.koin.androidx.compose.koinViewModel
 
 sealed class Screen(
     val route: String,
@@ -44,7 +43,7 @@ sealed class Screen(
 val bottomNavItems = listOf(Screen.Home, Screen.Calendar, Screen.Assets, Screen.Profile)
 
 @Composable
-fun AppNavigation(repository: BillRepository) {
+fun AppNavigation() {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -82,7 +81,7 @@ fun AppNavigation(repository: BillRepository) {
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(Screen.Home.route) {
-                val vm: HomeViewModel = viewModel(factory = HomeViewModel.Factory(repository))
+                val vm: HomeViewModel = koinViewModel()
                 HomeScreen(
                     viewModel = vm,
                     onAddClick = { navController.navigate("add_transaction") },
@@ -91,27 +90,27 @@ fun AppNavigation(repository: BillRepository) {
             }
 
             composable(Screen.Calendar.route) {
-                val vm: CalendarViewModel = viewModel(factory = CalendarViewModel.Factory(repository))
+                val vm: CalendarViewModel = koinViewModel()
                 CalendarScreen(viewModel = vm)
             }
 
             composable(Screen.Assets.route) {
-                val vm: AssetsViewModel = viewModel(factory = AssetsViewModel.Factory(repository))
+                val vm: AssetsViewModel = koinViewModel()
                 AssetsScreen(viewModel = vm)
             }
 
             composable(Screen.Profile.route) {
-                val vm: ProfileViewModel = viewModel(factory = ProfileViewModel.Factory(repository))
+                val vm: ProfileViewModel = koinViewModel()
                 ProfileScreen(viewModel = vm)
             }
 
             composable("add_transaction") {
-                val vm: AddTransactionViewModel = viewModel(factory = AddTransactionViewModel.Factory(repository))
+                val vm: AddTransactionViewModel = koinViewModel()
                 AddTransactionScreen(viewModel = vm, onNavigateBack = { navController.popBackStack() })
             }
 
             composable("stats") {
-                val vm: StatsViewModel = viewModel(factory = StatsViewModel.Factory(repository))
+                val vm: StatsViewModel = koinViewModel()
                 StatsScreen(viewModel = vm, onBack = { navController.popBackStack() })
             }
         }

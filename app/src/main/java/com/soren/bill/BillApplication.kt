@@ -1,19 +1,16 @@
 package com.soren.bill
 
 import android.app.Application
-import com.soren.bill.data.database.BillDatabase
-import com.soren.bill.data.repository.BillRepository
-import com.soren.bill.data.preferences.ThemePreferences
+import com.soren.bill.di.appModule
+import org.koin.android.ext.koin.androidContext
+import org.koin.core.context.startKoin
 
 class BillApplication : Application() {
-    val database by lazy { BillDatabase.getInstance(this) }
-    val repository by lazy {
-        BillRepository(
-            database.walletDao(),
-            database.accountDao(),
-            database.categoryDao(),
-            database.transactionDao()
-        )
+    override fun onCreate() {
+        super.onCreate()
+        startKoin {
+            androidContext(this@BillApplication)
+            modules(appModule)
+        }
     }
-    val themePreferences by lazy { ThemePreferences(this) }
 }

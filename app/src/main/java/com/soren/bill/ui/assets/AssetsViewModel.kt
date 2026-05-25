@@ -144,7 +144,5 @@ class AssetsViewModel(private val repository: BillRepository) : ViewModel() {
             }
         }
     }
-    class Factory(private val repository: BillRepository) : ViewModelProvider.Factory {
-        @Suppress("UNCHECKED_CAST") override fun <T : ViewModel> create(modelClass: Class<T>): T = AssetsViewModel(repository) as T
-    }
 }
+
