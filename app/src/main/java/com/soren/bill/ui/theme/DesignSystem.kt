@@ -21,7 +21,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
+import coil.compose.AsyncImage
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -35,14 +36,57 @@ import androidx.compose.ui.graphics.vector.ImageVector
 
 @Composable
 fun AccountIcon(type: String, name: String, size: Dp = 28.dp) {
-    val iconVector = when (type) {
-        "wechat" -> M3Icons.Filled.ChatBubble
-        "alipay" -> M3Icons.Filled.Shield
-        "bank_card" -> M3Icons.Filled.AccountBalance
-        "credit_card" -> M3Icons.Filled.CreditCard
-        "loan" -> M3Icons.Filled.RequestQuote
-        "cash" -> M3Icons.Filled.Payments
-        else -> M3Icons.Filled.Wallet
+    val bankCode = when {
+        name.contains("工商") -> "ICBC"
+        name.contains("建设") -> "CCB"
+        name.contains("农业") -> "ABC"
+        name.contains("中国银行") -> "BOC"
+        name.contains("交通") -> "COMM"
+        name.contains("招商") -> "CMB"
+        name.contains("邮政") -> "PSBC"
+        name.contains("浦发") -> "SPDB"
+        name.contains("中信") -> "CITIC"
+        name.contains("光大") -> "CEB"
+        name.contains("民生") -> "CMBC"
+        name.contains("兴业") -> "CIB"
+        name.contains("广发") -> "GDB"
+        name.contains("华夏") -> "HXB"
+        name.contains("平安") -> "SPABANK"
+        name.contains("北京银行") -> "BJBANK"
+        name.contains("上海银行") -> "SHBANK"
+        name.contains("微信") -> "WECHAT"
+        name.contains("支付宝") -> "ALIPAY"
+        else -> null
+    }
+
+    if (bankCode != null && bankCode != "WECHAT" && bankCode != "ALIPAY") {
+        AsyncImage(
+            model = "https://apimg.alipay.com/combo.png?d=cashier&t=$bankCode",
+            contentDescription = name,
+            modifier = Modifier.size(size).clip(CircleShape).background(Color.White),
+            contentScale = ContentScale.Fit
+        )
+        return
+    }
+
+    if (bankCode == "ALIPAY") {
+        AsyncImage(
+            model = "https://gw.alipayobjects.com/zos/rmsportal/qHwSmyhKkXqXzzkARTkM.png",
+            contentDescription = name,
+            modifier = Modifier.size(size).clip(CircleShape),
+            contentScale = ContentScale.Crop
+        )
+        return
+    }
+
+    if (bankCode == "WECHAT") {
+        AsyncImage(
+            model = "https://res.wx.qq.com/a/wx_fed/assets/res/NTI4MWU5.ico",
+            contentDescription = name,
+            modifier = Modifier.size(size).clip(CircleShape).background(Color.White),
+            contentScale = ContentScale.Crop
+        )
+        return
     }
 
     val (colorStart, colorEnd) = accountGradientColors(type)
@@ -50,16 +94,11 @@ fun AccountIcon(type: String, name: String, size: Dp = 28.dp) {
     Box(
         modifier = Modifier
             .size(size)
-            .clip(RoundedCornerShape(size * 0.25f)) // iOS App Icon squircl-ish
-            .background(Brush.linearGradient(listOf(colorStart, colorEnd))),
+            .clip(CircleShape)
+            .background(androidx.compose.ui.graphics.Brush.linearGradient(listOf(colorStart, colorEnd))),
         contentAlignment = Alignment.Center
     ) {
-        androidx.compose.material3.Icon(
-            imageVector = iconVector,
-            contentDescription = name,
-            tint = Color.White,
-            modifier = Modifier.size(size * 0.55f)
-        )
+        Text(name.take(1), color = Color.White, fontSize = (size.value * 0.45f).sp, fontWeight = FontWeight.Bold)
     }
 }
 
