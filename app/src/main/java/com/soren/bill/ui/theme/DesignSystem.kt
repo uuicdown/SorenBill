@@ -1,15 +1,25 @@
 package com.soren.bill.ui.theme
 
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -20,76 +30,49 @@ import androidx.compose.material.icons.Icons as M3Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.automirrored.filled.*
 
-// 银行名称 → 本地 PNG 图标映射
-private val bankIconMap = mapOf(
-    "中国工商银行" to com.soren.bill.R.drawable.bank_icbc,
-    "中国建设银行" to com.soren.bill.R.drawable.bank_ccb,
-    "中国农业银行" to com.soren.bill.R.drawable.bank_abc,
-    "中国银行" to com.soren.bill.R.drawable.bank_boc,
-    "交通银行" to com.soren.bill.R.drawable.bank_comm,
-    "招商银行" to com.soren.bill.R.drawable.bank_cmb,
-    "邮政储蓄银行" to com.soren.bill.R.drawable.bank_psbc,
-    "浦发银行" to com.soren.bill.R.drawable.bank_spdb,
-    "中信银行" to com.soren.bill.R.drawable.bank_citic,
-    "光大银行" to com.soren.bill.R.drawable.bank_ceb,
-    "民生银行" to com.soren.bill.R.drawable.bank_cmbc,
-    "兴业银行" to com.soren.bill.R.drawable.bank_cib,
-    "广发银行" to com.soren.bill.R.drawable.bank_gdb,
-    "华夏银行" to com.soren.bill.R.drawable.bank_hxb,
-    "平安银行" to com.soren.bill.R.drawable.bank_pingan,
-    "北京银行" to com.soren.bill.R.drawable.bank_bj,
-    "上海银行" to com.soren.bill.R.drawable.bank_sh,
-    "江苏银行" to com.soren.bill.R.drawable.bank_js,
-    "南京银行" to com.soren.bill.R.drawable.bank_nj,
-    "宁波银行" to com.soren.bill.R.drawable.bank_nb,
-    "杭州银行" to com.soren.bill.R.drawable.bank_hz,
-    "浙商银行" to com.soren.bill.R.drawable.bank_cz
-)
-
-// 网贷/支付平台 → 本地 PNG 图标映射
-private val paymentIconMap = mapOf(
-    "微信" to com.soren.bill.R.drawable.ic_wechat,
-    "支付宝" to com.soren.bill.R.drawable.ic_alipay,
-    "京东白条" to com.soren.bill.R.drawable.ic_jd,
-    "美团月付" to com.soren.bill.R.drawable.ic_meituan
-)
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.vector.ImageVector
 
 @Composable
 fun AccountIcon(type: String, name: String, size: Dp = 28.dp) {
-    // 先查银行图标
-    val bankRes = bankIconMap[name]
-    if (bankRes != null) {
-        Image(painter = painterResource(id = bankRes), contentDescription = name, modifier = Modifier.size(size))
-        return
+    val iconVector = when (type) {
+        "wechat" -> M3Icons.Filled.ChatBubble
+        "alipay" -> M3Icons.Filled.Shield
+        "bank_card" -> M3Icons.Filled.AccountBalance
+        "credit_card" -> M3Icons.Filled.CreditCard
+        "loan" -> M3Icons.Filled.RequestQuote
+        "cash" -> M3Icons.Filled.Payments
+        else -> M3Icons.Filled.Wallet
     }
-    // 支付平台图标
-    val payRes = paymentIconMap.entries.firstOrNull { name.contains(it.key) }?.value
-    if (payRes != null) {
-        Image(painter = painterResource(id = payRes), contentDescription = name, modifier = Modifier.size(size))
-        return
-    }
-    // 无 PNG 图标 → 首字圆标降级
-    val initial = when {
-        name.contains("工商") -> "工"; name.contains("建设") -> "建"; name.contains("农业") -> "农"
-        name.contains("交通") -> "交"; name.contains("招商") -> "招"; name.contains("邮政") -> "邮"
-        name.contains("浦发") -> "浦"; name.contains("中信") -> "信"; name.contains("光大") -> "光"
-        name.contains("民生") -> "民"; name.contains("兴业") -> "兴"; name.contains("广发") -> "广"
-        name.contains("华夏") -> "华"; name.contains("平安") -> "平"; name.contains("北京") -> "京"
-        name.contains("上海") -> "沪"; name.contains("花呗") -> "花"; name.contains("借呗") -> "借"
-        name.contains("微粒") -> "微"; name.contains("度小满") -> "度"; name.contains("现金") -> "现"
-        name.contains("江苏") -> "苏"; name.contains("南京") -> "宁"
-        else -> name.take(1)
-    }
-    Box(Modifier.size(size).clip(CircleShape).background(accountBrandColor(type)), contentAlignment = Alignment.Center) {
-        Text(initial, color = Color.White, fontSize = (size.value * 0.45f).sp, fontWeight = FontWeight.Bold)
+
+    val (colorStart, colorEnd) = accountGradientColors(type)
+    
+    Box(
+        modifier = Modifier
+            .size(size)
+            .clip(RoundedCornerShape(size * 0.25f)) // iOS App Icon squircl-ish
+            .background(Brush.linearGradient(listOf(colorStart, colorEnd))),
+        contentAlignment = Alignment.Center
+    ) {
+        androidx.compose.material3.Icon(
+            imageVector = iconVector,
+            contentDescription = name,
+            tint = Color.White,
+            modifier = Modifier.size(size * 0.55f)
+        )
     }
 }
 
-fun accountBrandColor(type: String): Color = when (type) {
-    "wechat" -> Color(0xFF07C160); "alipay" -> Color(0xFF1677FF)
-    "bank_card" -> Color(0xFFE74C3C); "credit_card" -> Color(0xFF9B59B6)
-    "loan" -> Color(0xFFE67E22); "cash" -> Color(0xFF27AE60)
-    else -> Color(0xFF607D8B)
+fun accountBrandColor(type: String): Color = accountGradientColors(type).first
+
+fun accountGradientColors(type: String): Pair<Color, Color> = when (type) {
+    "wechat" -> Pair(Color(0xFF2ECA71), Color(0xFF07C160))
+    "alipay" -> Pair(Color(0xFF4293FF), Color(0xFF1677FF))
+    "bank_card" -> Pair(Color(0xFFE74C3C), Color(0xFFC0392B))
+    "credit_card" -> Pair(Color(0xFF9B59B6), Color(0xFF8E44AD))
+    "loan" -> Pair(Color(0xFFF39C12), Color(0xFFD35400))
+    "cash" -> Pair(Color(0xFF2ECC71), Color(0xFF27AE60))
+    else -> Pair(Color(0xFF78909C), Color(0xFF546E7A))
 }
 
 // === 分类图标映射 ===
@@ -106,4 +89,41 @@ fun categoryIcon(name: String): androidx.compose.ui.graphics.vector.ImageVector 
     "红包" -> M3Icons.Filled.CardGiftcard; "报销" -> M3Icons.Filled.Receipt; "房租收入" -> M3Icons.Filled.Apartment
     "转让" -> M3Icons.Filled.SwapHoriz; "余额调整" -> M3Icons.Filled.Tune; "其它" -> M3Icons.Filled.MoreHoriz
     else -> M3Icons.Filled.Circle
+}
+
+// === Soren (Premium x iOS) Design Elements ===
+
+val CardCornerRadius = 20.dp
+val DialogCornerRadius = 24.dp
+
+val SorenCardShape = RoundedCornerShape(CardCornerRadius)
+val SorenDialogShape = RoundedCornerShape(DialogCornerRadius)
+
+fun Modifier.sorenShadow(
+    color: Color = Color(0x14000000), // 8% black
+    blurRadius: Dp = 16.dp,
+    offsetY: Dp = 8.dp
+): Modifier = this.shadow(
+    elevation = blurRadius,
+    shape = SorenCardShape,
+    spotColor = color,
+    ambientColor = color
+)
+
+fun Modifier.bounceClick(
+    onClick: () -> Unit
+): Modifier = composed {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed) 0.95f else 1f,
+        label = "bounceScale"
+    )
+    this
+        .scale(scale)
+        .clickable(
+            interactionSource = interactionSource,
+            indication = null, // Disable default ripple for iOS feel
+            onClick = onClick
+        )
 }

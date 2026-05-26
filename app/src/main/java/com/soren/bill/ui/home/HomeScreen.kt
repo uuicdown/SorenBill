@@ -20,7 +20,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.soren.bill.util.DateUtils
+import com.soren.bill.ui.theme.SorenCardShape
+import com.soren.bill.ui.theme.bounceClick
 import com.soren.bill.ui.theme.categoryIcon
+import com.soren.bill.ui.theme.sorenShadow
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -33,12 +36,21 @@ fun HomeScreen(viewModel: HomeViewModel, onAddClick: () -> Unit, onStatsClick: (
 
     Box(Modifier.fillMaxSize()) {
         Column(Modifier.fillMaxSize()) {
-            HomeMonthHeader(
-                timestamp = uiState.currentMonthTimestamp,
-                onSwitchMonth = { viewModel.switchMonth(it) },
-                onStatsClick = onStatsClick,
-                onDaySelected = { selectedDayDate = it }
-            )
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .sorenShadow(),
+                shape = SorenCardShape,
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+            ) {
+                HomeMonthHeader(
+                    timestamp = uiState.currentMonthTimestamp,
+                    onSwitchMonth = { viewModel.switchMonth(it) },
+                    onStatsClick = onStatsClick,
+                    onDaySelected = { selectedDayDate = it }
+                )
+            }
             SummaryCard(income = uiState.monthlyIncome, expense = uiState.monthlyExpense)
 
             if (uiState.isLoading) {
@@ -150,7 +162,7 @@ fun HomeMonthHeader(timestamp: Long, onSwitchMonth: (Long) -> Unit, onStatsClick
 
 @Composable
 fun SummaryCard(income: Double, expense: Double) {
-    Card(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp), shape = RoundedCornerShape(24.dp),
+    Card(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp).sorenShadow(), shape = SorenCardShape,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)), elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)) {
         Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 24.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
             SumItem("\u5165\u8d26", income, com.soren.bill.ui.theme.IncomeGreen, Modifier.weight(1f))
@@ -176,8 +188,16 @@ fun TxRow(tx: com.soren.bill.data.entity.Transaction, categoryName: String, onCl
     val isExpense = tx.type == "expense"
     val color = if (isExpense) com.soren.bill.ui.theme.ExpenseRed else com.soren.bill.ui.theme.IncomeGreen
     val bgColor = color.copy(alpha = 0.12f)
-    Surface(Modifier.fillMaxWidth().padding(vertical = 6.dp).clickable { onClick() }, shape = RoundedCornerShape(16.dp), color = Color.Transparent) {
-        Row(Modifier.fillMaxWidth().padding(vertical = 12.dp, horizontal = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+    Box(
+        Modifier
+            .fillMaxWidth()
+            .padding(vertical = 6.dp)
+            .sorenShadow()
+            .clip(SorenCardShape)
+            .background(MaterialTheme.colorScheme.surface)
+            .bounceClick { onClick() }
+    ) {
+        Row(Modifier.fillMaxWidth().padding(vertical = 12.dp, horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
             Box(modifier = Modifier.size(48.dp).clip(CircleShape).background(bgColor), contentAlignment = Alignment.Center) {
                 Icon(categoryIcon(categoryName), null, Modifier.size(24.dp), tint = color)
             }

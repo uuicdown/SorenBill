@@ -6,48 +6,56 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
 val Typography = Typography(
+    // iOS Large Title style
     headlineLarge = TextStyle(
         fontWeight = FontWeight.Bold,
-        fontSize = 28.sp,
-        lineHeight = 36.sp,
-        letterSpacing = 0.sp
+        fontSize = 34.sp,
+        lineHeight = 41.sp,
+        letterSpacing = 0.37.sp
     ),
+    // iOS Title 1 style
     headlineMedium = TextStyle(
+        fontWeight = FontWeight.Bold,
+        fontSize = 28.sp,
+        lineHeight = 34.sp,
+        letterSpacing = 0.36.sp
+    ),
+    // iOS Title 2 style
+    titleLarge = TextStyle(
         fontWeight = FontWeight.SemiBold,
         fontSize = 22.sp,
         lineHeight = 28.sp,
-        letterSpacing = 0.sp
+        letterSpacing = 0.35.sp
     ),
-    titleLarge = TextStyle(
+    // iOS Title 3 style
+    titleMedium = TextStyle(
         fontWeight = FontWeight.SemiBold,
         fontSize = 20.sp,
-        lineHeight = 26.sp,
-        letterSpacing = 0.sp
+        lineHeight = 25.sp,
+        letterSpacing = 0.38.sp
     ),
-    titleMedium = TextStyle(
-        fontWeight = FontWeight.Medium,
-        fontSize = 16.sp,
-        lineHeight = 24.sp,
-        letterSpacing = 0.15.sp
-    ),
+    // iOS Body (Large)
     bodyLarge = TextStyle(
         fontWeight = FontWeight.Normal,
-        fontSize = 16.sp,
-        lineHeight = 24.sp,
-        letterSpacing = 0.5.sp
+        fontSize = 17.sp,
+        lineHeight = 22.sp,
+        letterSpacing = (-0.41).sp
     ),
+    // iOS Callout / Subheadline
     bodyMedium = TextStyle(
         fontWeight = FontWeight.Normal,
-        fontSize = 14.sp,
+        fontSize = 15.sp,
         lineHeight = 20.sp,
-        letterSpacing = 0.25.sp
+        letterSpacing = (-0.24).sp
     ),
+    // iOS Footnote
     bodySmall = TextStyle(
         fontWeight = FontWeight.Normal,
-        fontSize = 12.sp,
-        lineHeight = 16.sp,
-        letterSpacing = 0.4.sp
+        fontSize = 13.sp,
+        lineHeight = 18.sp,
+        letterSpacing = (-0.08).sp
     ),
+    // Standard Labels
     labelLarge = TextStyle(
         fontWeight = FontWeight.Medium,
         fontSize = 14.sp,
@@ -58,6 +66,6 @@ val Typography = Typography(
         fontWeight = FontWeight.Medium,
         fontSize = 11.sp,
         lineHeight = 16.sp,
-        letterSpacing = 0.5.sp
+        letterSpacing = 0.06.sp
     )
 )
