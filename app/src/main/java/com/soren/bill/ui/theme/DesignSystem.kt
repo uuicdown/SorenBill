@@ -30,7 +30,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.material.icons.Icons as M3Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.automirrored.filled.*
-
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.vector.ImageVector
 
@@ -95,10 +94,11 @@ fun AccountIcon(type: String, name: String, size: Dp = 28.dp) {
         modifier = Modifier
             .size(size)
             .clip(CircleShape)
-            .background(androidx.compose.ui.graphics.Brush.linearGradient(listOf(colorStart, colorEnd))),
+            .background(Brush.linearGradient(listOf(colorStart, colorEnd))),
         contentAlignment = Alignment.Center
     ) {
-        Text(name.take(1), color = Color.White, fontSize = (size.value * 0.45f).sp, fontWeight = FontWeight.Bold)
+        val initial = if (name.isNotEmpty()) name.take(1) else "?"
+        Text(initial, color = Color.White, fontSize = (size.value * 0.45f).sp, fontWeight = FontWeight.Bold)
     }
 }
 
@@ -116,16 +116,16 @@ fun accountGradientColors(type: String): Pair<Color, Color> = when (type) {
 
 // === 分类图标映射 ===
 
-fun categoryIcon(name: String): androidx.compose.ui.graphics.vector.ImageVector = when (name) {
+fun categoryIcon(name: String): ImageVector = when (name) {
     "餐饮" -> M3Icons.Filled.Restaurant; "交通" -> M3Icons.Filled.DirectionsBus; "购物" -> M3Icons.Filled.ShoppingCart
     "娱乐" -> M3Icons.Filled.Movie; "居住" -> M3Icons.Filled.Home; "医疗" -> M3Icons.Filled.LocalHospital
-    "人情" -> M3Icons.Filled.Favorite; "教育" -> M3Icons.Filled.School; "通讯" -> M3Icons.Filled.Phone
-    "服饰" -> M3Icons.Filled.Checkroom; "日用" -> M3Icons.Filled.CleaningServices; "数码" -> M3Icons.Filled.Devices
+    "恋爱" -> M3Icons.Filled.Favorite; "教育" -> M3Icons.Filled.School; "通讯" -> M3Icons.Filled.Phone
+    "服饰" -> M3Icons.Filled.Checkroom; "家政" -> M3Icons.Filled.CleaningServices; "数码" -> M3Icons.Filled.Devices
     "宠物" -> M3Icons.Filled.Pets; "运动" -> M3Icons.Filled.FitnessCenter; "旅行" -> M3Icons.Filled.Flight
     "美容" -> M3Icons.Filled.Face; "零食" -> M3Icons.Filled.Icecream; "水果" -> M3Icons.Filled.LocalFlorist
     "外卖" -> M3Icons.Filled.DeliveryDining; "工资" -> M3Icons.Filled.Paid; "奖金" -> M3Icons.Filled.EmojiEvents
     "兼职" -> M3Icons.Filled.Work; "理财" -> M3Icons.AutoMirrored.Filled.TrendingUp; "退款" -> M3Icons.Filled.MoneyOff
-    "红包" -> M3Icons.Filled.CardGiftcard; "报销" -> M3Icons.Filled.Receipt; "房租收入" -> M3Icons.Filled.Apartment
+    "红包" -> M3Icons.Filled.CardGiftcard; "报销" -> M3Icons.Filled.Receipt; "二手交易" -> M3Icons.Filled.Apartment
     "转让" -> M3Icons.Filled.SwapHoriz; "余额调整" -> M3Icons.Filled.Tune; "其它" -> M3Icons.Filled.MoreHoriz
     else -> M3Icons.Filled.Circle
 }
