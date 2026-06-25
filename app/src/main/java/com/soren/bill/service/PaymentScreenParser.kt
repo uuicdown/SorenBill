@@ -31,9 +31,29 @@ object PaymentScreenParser {
         "订单号", "交易单号", "商户订单号", "转账单号",
         "Order ID", "Transaction ID", "Order Number", "Trade No."
     )
+    /** 交易详情页/账单页的关键词（标题栏 + 页面内标签） */
     private val DETAIL_KEYWORDS = listOf(
+        // 中文
         "账单详情", "交易详情", "支付详情", "订单详情",
-        "Transaction Details", "Bill Details", "Payment Details", "Order Details"
+        "交易记录", "账单", "明细",
+        // English
+        "Transaction Details", "Bill Details", "Payment Details", "Order Details",
+        "Transaction Record", "Bill", "Details",
+        // 通用状态标签（详情页一定包含）
+        "交易状态", "支付状态", "收款方", "付款方",
+        "Status", "Amount", "Merchant", "Order Number", "Order ID",
+        "Transaction ID", "Trade No.", "Payment Method",
+        "收款方式", "付款方式", "交易时间", "订单编号",
+        "Time", "Date"
+    )
+
+    /** 金额+标签双检测：页面同时含 ¥ 金额和支付标签 → 判定为支付相关页面 */
+    private val AMOUNT_AND_LABEL_KEYWORDS = listOf(
+        "¥", "￥",
+        "amount", "Amount", "金额",
+        "商户", "merchant", "Merchant", "收款方", "Payee",
+        "订单", "order", "Order", "交易", "Trade",
+        "支付", "payment", "Payment"
     )
 
     /**
@@ -73,10 +93,24 @@ object PaymentScreenParser {
     }
 
     /**
+     * 通过金额+标签双检测，判断是否为支付相关页面（不依赖精确标题）。
+     * 兜底策略：成功页+详情页关键词都无法匹配时，只要页面同时含 ¥ 金额和支付标签就触发。
+     */
+    fun isPaymentRelatedPage(root: AccessibilityNodeInfo?): Boolean {
+        if (root == null) return false
+        val allTexts = extractAllTexts(root).joinToString(" ")
+        val hasAmount = AMOUNT_REGEX.containsMatchIn(allTexts)
+        val hasLabel = AMOUNT_AND_LABEL_KEYWORDS.any { allTexts.contains(it, ignoreCase = true) }
+        return hasAmount && hasLabel
+    }
+
+    /**
      * 判断当前窗口是否为支付成功页或交易详情页（无障碍服务入口用）
      */
     fun isPaymentOrDetailScreen(root: AccessibilityNodeInfo?): Boolean {
-        return isPaymentSuccessScreen(root) || isTransactionDetailScreen(root)
+        return isPaymentSuccessScreen(root)
+            || isTransactionDetailScreen(root)
+            || isPaymentRelatedPage(root)
     }
 
     /**
