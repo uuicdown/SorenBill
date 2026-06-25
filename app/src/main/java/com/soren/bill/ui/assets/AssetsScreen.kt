@@ -92,7 +92,7 @@ fun AssetsScreen(viewModel: AssetsViewModel) {
     }
     if (showAdd) AddDialog(onDismiss = { showAdd = false }, onConfirm = { n, t, l, d, b -> viewModel.addAccount(n, t, l, d, b); showAdd = false; snackMsg = "已添加「$n」" })
     if (editing != null) EditDialog(bal = editing!!, onDismiss = { editing = null },
-        onSave = { viewModel.updateAccount(it); editing = null },
+        onSave = { viewModel.updateAccount(it) },
         onAdjust = { viewModel.adjustBalance(editing!!, it); editing = null },
         onDelete = { viewModel.deleteAccount(editing!!.account); editing = null })
 }
@@ -160,6 +160,7 @@ fun EditDialog(bal: AccountBalance, onDismiss: () -> Unit, onSave: (Account) -> 
         TextButton(onClick = {
             onSave(bal.account.copy(name = name.trim().ifBlank { bal.account.name }, creditLimit = limit.toDoubleOrNull() ?: bal.account.creditLimit, paymentDueDay = dueDay.toIntOrNull() ?: bal.account.paymentDueDay))
             newBal.toDoubleOrNull()?.let { onAdjust(it) }
+            onDismiss()
         }) { Text("保存") }
     }, dismissButton = { Row { TextButton(onClick = onDelete) { Text("删除", color = ExpenseRed) }; TextButton(onClick = onDismiss) { Text("取消") } } })
 }
