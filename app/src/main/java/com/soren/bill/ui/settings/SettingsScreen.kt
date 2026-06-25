@@ -20,6 +20,7 @@ import android.service.notification.NotificationListenerService
 
 import com.soren.bill.data.preferences.AppPreferences
 import com.soren.bill.data.preferences.ThemeMode
+import com.soren.bill.service.PendingTransactionManager
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -74,6 +75,28 @@ fun SettingsScreen(onBack: () -> Unit) {
                     }
                     Spacer(Modifier.height(6.dp))
                     Text("\u5f00\u542f\u540e Soren \u53ef\u4ee5\u901a\u8fc7\u901a\u77e5\u680f\u81ea\u52a8\u6355\u83b7\u5fae\u4fe1/\u652f\u4ed8\u5b9d\u7684\u652f\u51fa\u901a\u77e5\uff0c\u5373\u4fbf\u624b\u673a\u9501\u5c4f\u4e5f\u80fd\u8bb0\u8d26\u3002", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+
+            // 手动页面检测
+            val scanLog by PendingTransactionManager.scanLog.collectAsState()
+            Card(Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)), elevation = CardDefaults.cardElevation(0.dp)) {
+                Column(Modifier.padding(16.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text("页面检测", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
+                        Button(onClick = {
+                            PendingTransactionManager.requestScan()
+                            PendingTransactionManager.clearScanLog()
+                        }) { Text("检测当前页面") }
+                    }
+                    Spacer(Modifier.height(6.dp))
+                    Text("在微信/支付宝打开账单详情页后，点此按钮让 Soren 尝试识别", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    if (scanLog != null) {
+                        Spacer(Modifier.height(8.dp))
+                        Surface(shape = RoundedCornerShape(8.dp), color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)) {
+                            Text(scanLog!!, Modifier.padding(12.dp), style = MaterialTheme.typography.bodySmall)
+                        }
+                    }
                 }
             }
 

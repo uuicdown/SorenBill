@@ -15,6 +15,14 @@ object PendingTransactionManager {
     private val _suggestedCategory = MutableStateFlow<String?>(null)
     val suggestedCategory: StateFlow<String?> = _suggestedCategory.asStateFlow()
 
+    /** 手动扫描触发器：UI 写入 true → 服务收到后执行扫描 → 写回 false */
+    private val _scanRequest = MutableStateFlow(false)
+    val scanRequest: StateFlow<Boolean> = _scanRequest.asStateFlow()
+
+    /** 最后一次手动扫描的日志消息（用于 UI 展示） */
+    private val _scanLog = MutableStateFlow<String?>(null)
+    val scanLog: StateFlow<String?> = _scanLog.asStateFlow()
+
     fun postTransaction(info: ParsedPaymentInfo, suggestedCategory: String? = null) {
         _pendingTransaction.value = info
         _suggestedCategory.value = suggestedCategory
@@ -24,6 +32,22 @@ object PendingTransactionManager {
         _pendingTransaction.value = null
         _suggestedCategory.value = null
     }
+
+    /** 请求一次手动扫描 */
+    fun requestScan() { _scanRequest.value = true }
+
+    /** 服务端调用：消费扫描请求 */
+    fun consumeScanRequest(): Boolean {
+        val pending = _scanRequest.value
+        if (pending) _scanRequest.value = false
+        return pending
+    }
+
+    /** 写入扫描日志（UI 层 collect 展示） */
+    fun postScanLog(msg: String) { _scanLog.value = msg }
+
+    /** 清除扫描日志 */
+    fun clearScanLog() { _scanLog.value = null }
 
     /** 是否有待确认的交易 */
     val hasPending: Boolean get() = _pendingTransaction.value != null

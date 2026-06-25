@@ -36,6 +36,39 @@ class AutoAccountingAccessibilityService : AccessibilityService() {
         super.onCreate()
         createNotificationChannel()
         Log.d(TAG, "AccessibilityService created and bound")
+
+        // 监听手动扫描请求
+        serviceScope.launch {
+            PendingTransactionManager.scanRequest.collect { requested ->
+                if (requested) {
+                    delay(500) // 给页面一点时间
+                    PendingTransactionManager.consumeScanRequest()
+                    val root = rootInActiveWindow
+                    if (root == null) {
+                        PendingTransactionManager.postScanLog("❌ rootInActiveWindow 为 null，请确认已打开微信/支付宝页面")
+                        return@collect
+                    }
+                    val isPayment = PaymentScreenParser.isPaymentOrDetailScreen(root)
+                    if (!isPayment) {
+                        PendingTransactionManager.postScanLog("❌ 当前页面未识别为支付相关页面（关键词/金额匹配失败）")
+                        return@collect
+                    }
+                    val pageType = when {
+                        PaymentScreenParser.isPaymentSuccessScreen(root) -> "支付成功页"
+                        PaymentScreenParser.isTransactionDetailScreen(root) -> "交易详情页"
+                        else -> "支付相关页（金额+标签匹配）"
+                    }
+                    val info = PaymentScreenParser.parse(root)
+                    if (info == null) {
+                        PendingTransactionManager.postScanLog("❌ 已识别为${pageType}，但解析金额失败（AMOUNT_REGEX 未匹配）")
+                        return@collect
+                    }
+                    val msg = "✅ 识别为${pageType}\n金额: ¥${info.amount}\n商户: ${info.merchant ?: "未知"}\n来源: ${info.paymentMethod ?: "未知"}"
+                    PendingTransactionManager.postScanLog(msg)
+                    Log.d(TAG, "手动扫描成功: $msg")
+                }
+            }
+        }
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
