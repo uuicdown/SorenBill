@@ -14,6 +14,9 @@ import org.koin.compose.koinInject
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import android.content.Intent
+import android.provider.Settings
+import android.service.notification.NotificationListenerService
 
 import com.soren.bill.data.preferences.AppPreferences
 import com.soren.bill.data.preferences.ThemeMode
@@ -27,6 +30,7 @@ fun SettingsScreen(onBack: () -> Unit) {
     val themeMode by appPreferences.themeMode.collectAsState(initial = ThemeMode.SYSTEM)
     val confirmBeforeSaving by appPreferences.confirmBeforeSaving.collectAsState(initial = true)
     val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     Column(Modifier.fillMaxSize()) {
         TopAppBar(
@@ -55,6 +59,21 @@ fun SettingsScreen(onBack: () -> Unit) {
                         Text("Soren \u53d1\u73b0\u65b0\u8d26\u5355\u65f6\u4f1a\u5f39\u7a97\u786e\u8ba4", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                     Switch(checked = confirmBeforeSaving, onCheckedChange = { coroutineScope.launch { appPreferences.setConfirmBeforeSaving(it) } })
+                }
+            }
+
+            // 通知监听权限引导
+            Card(Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)), elevation = CardDefaults.cardElevation(0.dp)) {
+                Column(Modifier.padding(16.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text("\u901a\u77e5\u76d1\u542c\u6743\u9650", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
+                        Button(onClick = {
+                            val intent = Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
+                            context.startActivity(intent)
+                        }) { Text("\u53bb\u5f00\u542f") }
+                    }
+                    Spacer(Modifier.height(6.dp))
+                    Text("\u5f00\u542f\u540e Soren \u53ef\u4ee5\u901a\u8fc7\u901a\u77e5\u680f\u81ea\u52a8\u6355\u83b7\u5fae\u4fe1/\u652f\u4ed8\u5b9d\u7684\u652f\u51fa\u901a\u77e5\uff0c\u5373\u4fbf\u624b\u673a\u9501\u5c4f\u4e5f\u80fd\u8bb0\u8d26\u3002", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
 
