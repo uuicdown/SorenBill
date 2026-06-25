@@ -1,7 +1,6 @@
 package com.soren.bill.ui.theme
 
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -21,7 +20,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import coil.compose.AsyncImage
+import coil.compose.SubcomposeAsyncImage
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
@@ -32,6 +31,21 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.automirrored.filled.*
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.vector.ImageVector
+
+@Composable
+private fun GradientFallbackIcon(type: String, name: String, size: Dp) {
+    val (colorStart, colorEnd) = accountGradientColors(type)
+    Box(
+        modifier = Modifier
+            .size(size)
+            .clip(CircleShape)
+            .background(Brush.linearGradient(listOf(colorStart, colorEnd))),
+        contentAlignment = Alignment.Center
+    ) {
+        val initial = if (name.isNotEmpty()) name.take(1) else "?"
+        Text(initial, color = Color.White, fontSize = (size.value * 0.45f).sp, fontWeight = FontWeight.Bold)
+    }
+}
 
 @Composable
 fun AccountIcon(type: String, name: String, size: Dp = 28.dp) {
@@ -59,47 +73,39 @@ fun AccountIcon(type: String, name: String, size: Dp = 28.dp) {
     }
 
     if (bankCode != null && bankCode != "WECHAT" && bankCode != "ALIPAY") {
-        AsyncImage(
+        SubcomposeAsyncImage(
             model = "https://apimg.alipay.com/combo.png?d=cashier&t=$bankCode",
             contentDescription = name,
             modifier = Modifier.size(size).clip(CircleShape).background(Color.White),
-            contentScale = ContentScale.Fit
+            contentScale = ContentScale.Fit,
+            error = { GradientFallbackIcon(type, name, size) }
         )
         return
     }
 
     if (bankCode == "ALIPAY") {
-        AsyncImage(
+        SubcomposeAsyncImage(
             model = "https://gw.alipayobjects.com/zos/rmsportal/qHwSmyhKkXqXzzkARTkM.png",
             contentDescription = name,
             modifier = Modifier.size(size).clip(CircleShape),
-            contentScale = ContentScale.Crop
+            contentScale = ContentScale.Crop,
+            error = { GradientFallbackIcon(type, name, size) }
         )
         return
     }
 
     if (bankCode == "WECHAT") {
-        AsyncImage(
+        SubcomposeAsyncImage(
             model = "https://res.wx.qq.com/a/wx_fed/assets/res/NTI4MWU5.ico",
             contentDescription = name,
             modifier = Modifier.size(size).clip(CircleShape).background(Color.White),
-            contentScale = ContentScale.Crop
+            contentScale = ContentScale.Crop,
+            error = { GradientFallbackIcon(type, name, size) }
         )
         return
     }
 
-    val (colorStart, colorEnd) = accountGradientColors(type)
-    
-    Box(
-        modifier = Modifier
-            .size(size)
-            .clip(CircleShape)
-            .background(Brush.linearGradient(listOf(colorStart, colorEnd))),
-        contentAlignment = Alignment.Center
-    ) {
-        val initial = if (name.isNotEmpty()) name.take(1) else "?"
-        Text(initial, color = Color.White, fontSize = (size.value * 0.45f).sp, fontWeight = FontWeight.Bold)
-    }
+    GradientFallbackIcon(type, name, size)
 }
 
 fun accountBrandColor(type: String): Color = accountGradientColors(type).first
