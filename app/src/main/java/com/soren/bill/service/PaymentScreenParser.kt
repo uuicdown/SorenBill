@@ -16,27 +16,39 @@ data class ParsedPaymentInfo(
 @Suppress("DEPRECATION")
 object PaymentScreenParser {
 
-    private val AMOUNT_REGEX = Regex("""[¥￥]\s*(\d+\.?\d{0,2})""")
-    private val SUCCESS_KEYWORDS = listOf("支付成功", "付款成功", "交易成功", "支付结果", "转账成功")
-    private val MERCHANT_LABELS = listOf("收款方", "商户", "收款商家", "付款对象", "对方账户", "收款人", "商品", "付款详情")
-    private val METHOD_LABELS = listOf("支付方式", "付款方式")
-    private val ORDER_LABELS = listOf("订单号", "交易单号", "商户订单号", "转账单号")
+    private val AMOUNT_REGEX = Regex("""[¥￥\$]\s*(\d+\.?\d{0,2})""")
+    private val SUCCESS_KEYWORDS = listOf(
+        "支付成功", "付款成功", "交易成功", "支付结果", "转账成功",
+        "Payment Successful", "Payment Success", "Successful Payment",
+        "Paid Successfully", "Transaction Successful"
+    )
+    private val MERCHANT_LABELS = listOf(
+        "收款方", "商户", "收款商家", "付款对象", "对方账户", "收款人", "商品", "付款详情",
+        "Merchant", "Payee", "Seller", "收款方"
+    )
+    private val METHOD_LABELS = listOf("支付方式", "付款方式", "Payment Method", "Payment")
+    private val ORDER_LABELS = listOf(
+        "订单号", "交易单号", "商户订单号", "转账单号",
+        "Order ID", "Transaction ID", "Order Number", "Trade No."
+    )
+    private val DETAIL_KEYWORDS = listOf(
+        "账单详情", "交易详情", "支付详情", "订单详情",
+        "Transaction Details", "Bill Details", "Payment Details", "Order Details"
+    )
 
     /**
-     * 判断当前窗口是否为支付成功页面
+     * BFS 扫描文本，检查页面是否包含任意关键词
      */
-    fun isPaymentSuccessScreen(root: AccessibilityNodeInfo?): Boolean {
+    private fun screenContainsAny(root: AccessibilityNodeInfo?, keywords: List<String>): Boolean {
         if (root == null) return false
-        // BFS 扫描文本，找到任一成功关键词即判定
         val queue = ArrayDeque<AccessibilityNodeInfo>()
         queue.add(root)
         while (queue.isNotEmpty()) {
             val node = queue.removeFirst()
             val text = node.text?.toString() ?: ""
-            // 注意：部分节点可能包含大量拼接文本，contentDescription 也可能有效
             val desc = node.contentDescription?.toString() ?: ""
             val combined = "$text $desc"
-            if (SUCCESS_KEYWORDS.any { combined.contains(it) }) {
+            if (keywords.any { combined.contains(it) }) {
                 return true
             }
             for (i in 0 until node.childCount) {
@@ -44,6 +56,27 @@ object PaymentScreenParser {
             }
         }
         return false
+    }
+
+    /**
+     * 判断当前窗口是否为支付成功页面
+     */
+    fun isPaymentSuccessScreen(root: AccessibilityNodeInfo?): Boolean {
+        return screenContainsAny(root, SUCCESS_KEYWORDS)
+    }
+
+    /**
+     * 判断当前窗口是否为交易详情页
+     */
+    fun isTransactionDetailScreen(root: AccessibilityNodeInfo?): Boolean {
+        return screenContainsAny(root, DETAIL_KEYWORDS)
+    }
+
+    /**
+     * 判断当前窗口是否为支付成功页或交易详情页（无障碍服务入口用）
+     */
+    fun isPaymentOrDetailScreen(root: AccessibilityNodeInfo?): Boolean {
+        return isPaymentSuccessScreen(root) || isTransactionDetailScreen(root)
     }
 
     /**

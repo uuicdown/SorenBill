@@ -33,16 +33,17 @@ class PaymentNotificationListener : NotificationListenerService() {
             "com.eg.android.AlipayGphone"   // 支付宝
         )
 
-        // 微信支付通知标题关键词
-        private val WECHAT_PAY_TITLES = listOf("微信支付", "微信收款")
+        // 微信支付通知标题关键词（中英文）
+        private val WECHAT_PAY_TITLES = listOf("微信支付", "微信收款", "WeChat Pay", "Payment")
 
-        // 支付宝支出通知内容关键词
+        // 支付宝支出通知内容关键词（中英文）
         private val ALIPAY_SPENDING_KEYWORDS = listOf(
-            "支出", "消费", "付款", "转账", "扫码", "面对面"
+            "支出", "消费", "付款", "转账", "扫码", "面对面",
+            "Payment", "payment", "Spent", "spent", "Transaction", "Bill"
         )
 
-        // 金额提取正则
-        private val AMOUNT_REGEX = Regex("""[¥￥]\s*(\d+\.?\d{0,2})""")
+        // 金额提取正则（¥ 或 $ 符号前缀）
+        private val AMOUNT_REGEX = Regex("""[¥￥\$]\s*(\d+\.?\d{0,2})""")
     }
 
     override fun onNotificationPosted(sbn: StatusBarNotification) {

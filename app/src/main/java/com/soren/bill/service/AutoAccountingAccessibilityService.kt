@@ -65,9 +65,13 @@ class AutoAccountingAccessibilityService : AccessibilityService() {
             return
         }
 
-        if (!PaymentScreenParser.isPaymentSuccessScreen(root)) return
+        if (!PaymentScreenParser.isPaymentOrDetailScreen(root)) return
 
-        Log.d(TAG, "检测到支付成功页面，开始解析...")
+        val pageType = when {
+            PaymentScreenParser.isPaymentSuccessScreen(root) -> "支付成功"
+            else -> "交易详情"
+        }
+        Log.d(TAG, "检测到${pageType}页面，开始解析...")
         val info = PaymentScreenParser.parse(root) ?: run {
             Log.d(TAG, "解析失败，无法提取金额")
             return
