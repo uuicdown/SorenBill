@@ -13,9 +13,6 @@ import android.view.accessibility.AccessibilityNodeInfo
 import androidx.core.app.NotificationCompat
 import com.soren.bill.MainActivity
 import com.soren.bill.data.entity.Transaction
-import com.soren.bill.data.entity.Wallet
-import com.soren.bill.data.entity.Account
-import com.soren.bill.data.entity.Category
 import com.soren.bill.data.preferences.AppPreferences
 import com.soren.bill.data.repository.BillRepository
 import kotlinx.coroutines.*
@@ -146,57 +143,8 @@ class AutoAccountingAccessibilityService : AccessibilityService() {
         }
     }
 
-    /**
-     * 将解析结果写入数据库。
-     * 自动尝试匹配分类，默认回退到"其他"分类。
-     */
     private suspend fun saveTransaction(info: ParsedPaymentInfo) {
-        // 获取或创建默认钱包
-        val wallets = repository.getAllWallets().first()
-        val walletId = wallets.firstOrNull()?.id ?: run {
-            repository.insertWallet(Wallet(name = "我的钱包", currency = "CNY"))
-            repository.getAllWallets().first().first().id
-        }
-
-        // 获取或创建默认账户
-        val accounts = repository.getAllAccounts().first()
-        var accountId = accounts.firstOrNull()?.id
-        if (accountId == null) {
-            repository.insertAccount(Account(name = "微信/支付宝", type = "other"))
-            accountId = repository.getAllAccounts().first().first().id
-        }
-
-        // 匹配分类
-        val suggestion = MerchantCategoryMapper.classify(info.merchant)
-        val categoryName = suggestion?.targetCategoryName ?: "其他"
-        val expenseCategories = repository.getCategoriesByType("expense").first()
-        var categoryId = expenseCategories.firstOrNull { it.name == categoryName }?.id
-
-        if (categoryId == null) {
-            // 自动创建新分类
-            repository.insertCategory(Category(name = categoryName, type = "expense"))
-            categoryId = repository.getCategoriesByType("expense").first()
-                .firstOrNull { it.name == categoryName }?.id
-        }
-
-        val note = buildString {
-            if (!info.merchant.isNullOrBlank()) append(info.merchant)
-            if (!info.orderId.isNullOrBlank()) {
-                if (isNotEmpty()) append(" | ")
-                append("订单: ${info.orderId}")
-            }
-        }.takeIf { it.isNotBlank() }
-
-        val transaction = Transaction(
-            amount = info.amount,
-            type = "expense",
-            walletId = walletId,
-            accountId = accountId!!,
-            categoryId = categoryId!!,
-            date = System.currentTimeMillis(),
-            note = note
-        )
-        repository.insertTransaction(transaction)
+        TransactionSaver.save(info, repository)
     }
 
     override fun onInterrupt() {

@@ -20,10 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.soren.bill.data.entity.Account
-import com.soren.bill.data.entity.Category
-import com.soren.bill.data.entity.Transaction
-import com.soren.bill.data.entity.Wallet
+import com.soren.bill.service.TransactionSaver
 import com.soren.bill.data.preferences.AppPreferences
 import com.soren.bill.data.preferences.ThemeMode
 import com.soren.bill.data.repository.BillRepository
@@ -245,54 +242,12 @@ private fun DetailRow(label: String, value: String) {
     }
 }
 
-/** 将解析结果持久化写入数据库（与 Service 中 handleSilentSave 逻辑一致） */
 private suspend fun saveParsedTransaction(
     repository: BillRepository,
     info: ParsedPaymentInfo,
     suggestedCategory: String?
 ) {
-    // 获取或创建默认钱包
-    val wallets = repository.getAllWallets().first()
-    val walletId = wallets.firstOrNull()?.id ?: run {
-        repository.insertWallet(Wallet(name = "默认钱包", currency = "CNY"))
-        repository.getAllWallets().first().first().id
-    }
-
-    // 获取或创建默认账户
-    val accounts = repository.getAllAccounts().first()
-    var accountId = accounts.firstOrNull()?.id
-    if (accountId == null) {
-        repository.insertAccount(Account(name = "\u5fae\u4fe1/\u652f\u4ed8\u5b9d", type = "other"))
-        accountId = repository.getAllAccounts().first().first().id
-    }
-
-    // 匹配分类
-    val categoryName = suggestedCategory ?: "其他"
-    val expenseCategories = repository.getCategoriesByType("expense").first()
-    var categoryId = expenseCategories.firstOrNull { it.name == categoryName }?.id
-
-    if (categoryId == null) {
-        repository.insertCategory(Category(name = categoryName, type = "expense"))
-        categoryId = repository.getCategoriesByType("expense").first()
-            .firstOrNull { it.name == categoryName }?.id
-    }
-
-    val note = buildString {
-        if (!info.merchant.isNullOrBlank()) append(info.merchant)
-        if (!info.orderId.isNullOrBlank()) {
-            if (isNotEmpty()) append(" | ")
-            append("订单: ${info.orderId}")
-        }
-    }.takeIf { it.isNotBlank() }
-
-    val transaction = Transaction(
-        amount = info.amount,
-        type = "expense",
-        walletId = walletId,
-        accountId = accountId!!,
-        categoryId = categoryId!!,
-        date = System.currentTimeMillis(),
-        note = note
-    )
-    repository.insertTransaction(transaction)
+    // 注释：suggestedCategory 在 TransactionSaver 内部通过 MerchantCategoryMapper 重新匹配，
+    // 外部传入的分类仅在调用方用于预览，持久化以内部匹配为准。
+    TransactionSaver.save(info, repository)
 }

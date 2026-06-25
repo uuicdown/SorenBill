@@ -8,6 +8,8 @@ import com.soren.bill.data.entity.Account
 import com.soren.bill.data.entity.Transaction
 import com.soren.bill.data.entity.Wallet
 import com.soren.bill.data.repository.BillRepository
+import com.soren.bill.service.TransactionSaver
+import com.soren.bill.util.AccountingConstants
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
@@ -27,25 +29,28 @@ class AssetsViewModel(private val repository: BillRepository) : ViewModel() {
     private val _uiState = MutableStateFlow(AssetsUiState())
     val uiState: StateFlow<AssetsUiState> = _uiState.asStateFlow()
 
+    /** 当前选中的钱包，null = 全部。由 walletFlow 自动初始化为第一个钱包 */
     private val selectedWalletId = MutableStateFlow<Long?>(null)
 
     init {
+        // 单独收集钱包列表，驱动 selectedWalletId
         viewModelScope.launch {
             repository.getAllWallets().collect { wallets ->
                 if (wallets.isEmpty()) return@collect
 
-                val currentSelected = selectedWalletId.value
-                val nextSelected = when {
-                    currentSelected == null -> wallets.first().id
-                    wallets.any { it.id == currentSelected } -> currentSelected
+                val current = selectedWalletId.value
+                val next = when {
+                    current == null -> wallets.first().id
+                    wallets.any { it.id == current } -> current
                     else -> wallets.first().id
                 }
-
-                selectedWalletId.value = nextSelected
-                val name = wallets.firstOrNull { it.id == nextSelected }?.name ?: wallets.first().name
-                _uiState.update { it.copy(wallets = wallets, selectedWalletId = nextSelected, selectedWalletName = name) }
+                selectedWalletId.value = next
+                val name = wallets.firstOrNull { it.id == next }?.name ?: wallets.first().name
+                _uiState.update { it.copy(wallets = wallets, selectedWalletId = next, selectedWalletName = name) }
             }
         }
+
+        // 账户 + 交易 + 钱包选择 → 计算分组余额
         viewModelScope.launch {
             combine(
                 repository.getAllAccounts(),
@@ -66,8 +71,8 @@ class AssetsViewModel(private val repository: BillRepository) : ViewModel() {
         val balances = visible.map { account ->
             val atxs = filteredTxs.filter { it.accountId == account.id }
             AccountBalance(account,
-                atxs.filter { it.type == "income" }.sumOf { it.amount },
-                atxs.filter { it.type == "expense" }.sumOf { it.amount })
+                atxs.filter { it.type == AccountingConstants.TYPE_INCOME }.sumOf { it.amount },
+                atxs.filter { it.type == AccountingConstants.TYPE_EXPENSE }.sumOf { it.amount })
         }
         val groups = buildGroups(balances)
         val totalAsset = balances.filter { it.balance >= 0 }.sumOf { it.balance }
@@ -80,19 +85,16 @@ class AssetsViewModel(private val repository: BillRepository) : ViewModel() {
 
     fun selectWallet(walletId: Long?) {
         selectedWalletId.value = walletId
-        val name = if (walletId == null) {
-            "全部钱包"
-        } else {
-            _uiState.value.wallets.firstOrNull { it.id == walletId }?.name ?: "全部钱包"
-        }
+        val name = if (walletId == null) "全部钱包"
+        else _uiState.value.wallets.firstOrNull { it.id == walletId }?.name ?: "全部钱包"
         _uiState.update { it.copy(selectedWalletId = walletId, selectedWalletName = name) }
     }
 
     private fun buildGroups(balances: List<AccountBalance>): List<AccountGroup> {
-        val bankCards = balances.filter { it.account.type == "bank_card" }
-        val creditCards = balances.filter { it.account.type == "credit_card" }
-        val payments = balances.filter { it.account.type in listOf("wechat", "alipay") }
-        val payables = balances.filter { it.account.type == "loan" }
+        val bankCards = balances.filter { it.account.type == AccountingConstants.ACCOUNT_BANK }
+        val creditCards = balances.filter { it.account.type == AccountingConstants.ACCOUNT_CREDIT }
+        val payments = balances.filter { it.account.type in listOf(AccountingConstants.ACCOUNT_WECHAT, AccountingConstants.ACCOUNT_ALIPAY) }
+        val payables = balances.filter { it.account.type == AccountingConstants.ACCOUNT_LOAN }
         return listOfNotNull(
             if (bankCards.isNotEmpty()) AccountGroup("储蓄卡", bankCards, bankCards.sumOf { it.balance }) else null,
             if (payments.isNotEmpty()) AccountGroup("网络支付", payments, payments.sumOf { it.balance }) else null,
@@ -103,38 +105,36 @@ class AssetsViewModel(private val repository: BillRepository) : ViewModel() {
 
     fun addAccount(name: String, type: String, creditLimit: Double, paymentDueDay: Int, initialBalance: Double) {
         viewModelScope.launch {
-            val accountId = repository.insertAccount(Account(name = name, type = type, creditLimit = creditLimit, paymentDueDay = paymentDueDay))
+            val accountId = repository.insertAccount(
+                Account(name = name, type = type, creditLimit = creditLimit, paymentDueDay = paymentDueDay)
+            )
             if (initialBalance != 0.0) {
-                // 创建初始余额调整
-                val type = if (initialBalance > 0) "income" else "expense"
-                val cats = repository.getCategoriesByType(type).first()
-                val catId = cats.firstOrNull { it.name == "余额调整" }?.id ?: cats.firstOrNull()?.id ?: 0L
+                val txnType = if (initialBalance > 0) AccountingConstants.TYPE_INCOME else AccountingConstants.TYPE_EXPENSE
+                val catId = TransactionSaver.resolveAdjustmentCategoryId(repository, txnType)
                 val walletId = repository.getAllWallets().first().firstOrNull()?.id ?: 1L
-                if (catId > 0) {
-                    repository.insertTransaction(Transaction(
-                        amount = Math.abs(initialBalance), type = type,
-                        walletId = walletId, accountId = accountId, categoryId = catId,
-                        date = System.currentTimeMillis(), note = "初始余额"
-                    ))
-                }
+                repository.insertTransaction(Transaction(
+                    amount = Math.abs(initialBalance), type = txnType,
+                    walletId = walletId, accountId = accountId, categoryId = catId,
+                    date = System.currentTimeMillis(), note = "初始余额"
+                ))
             }
         }
     }
+
     fun updateAccount(account: Account) { viewModelScope.launch { repository.updateAccount(account) } }
     fun deleteAccount(account: Account) { viewModelScope.launch { repository.deleteAccount(account.id) } }
+
     fun adjustBalance(bal: AccountBalance, newBal: Double) {
         val diff = newBal - bal.balance
         if (diff == 0.0) return
         viewModelScope.launch {
             try {
-                val type = if (diff > 0) "income" else "expense"
-                val cats = repository.getCategoriesByType(type).first()
-                val catId = cats.firstOrNull { it.name == "余额调整" }?.id
-                    ?: cats.firstOrNull()?.id ?: 1L
-                val walletId = uiState.value.selectedWalletId
+                val txnType = if (diff > 0) AccountingConstants.TYPE_INCOME else AccountingConstants.TYPE_EXPENSE
+                val catId = TransactionSaver.resolveAdjustmentCategoryId(repository, txnType)
+                val walletId = _uiState.value.selectedWalletId
                     ?: repository.getAllWallets().first().firstOrNull()?.id ?: 1L
                 repository.insertTransaction(Transaction(
-                    amount = Math.abs(diff), type = type,
+                    amount = Math.abs(diff), type = txnType,
                     walletId = walletId, accountId = bal.account.id,
                     categoryId = catId, date = System.currentTimeMillis(),
                     note = "手动调整余额"
@@ -144,5 +144,9 @@ class AssetsViewModel(private val repository: BillRepository) : ViewModel() {
             }
         }
     }
-}
 
+    class Factory(private val repository: BillRepository) : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>): T = AssetsViewModel(repository) as T
+    }
+}
