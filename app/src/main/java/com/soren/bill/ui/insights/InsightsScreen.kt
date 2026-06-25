@@ -16,6 +16,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.soren.bill.ui.theme.ExpenseRed
 import com.soren.bill.ui.theme.IncomeGreen
+import com.soren.bill.ui.theme.SorenCardShape
+import com.soren.bill.ui.theme.sorenShadow
 import com.soren.bill.util.DateUtils
 
 @Composable
@@ -36,7 +38,7 @@ fun InsightsScreen(viewModel: InsightsViewModel) {
         Text("${DateUtils.formatMonth(System.currentTimeMillis())} \u7b2c\u4e09\u5468", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
 
         // 本周总支出卡片
-        Card(Modifier.fillMaxWidth(), shape = RoundedCornerShape(20.dp),
+        Card(Modifier.fillMaxWidth().sorenShadow(), shape = SorenCardShape,
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
             elevation = CardDefaults.cardElevation(0.dp)) {
             Column(Modifier.padding(20.dp), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -49,7 +51,7 @@ fun InsightsScreen(viewModel: InsightsViewModel) {
         }
 
         // 预算剩余
-        Card(Modifier.fillMaxWidth(), shape = RoundedCornerShape(20.dp),
+        Card(Modifier.fillMaxWidth().sorenShadow(), shape = SorenCardShape,
             colors = CardDefaults.cardColors(containerColor = IncomeGreen.copy(alpha = 0.08f)),
             elevation = CardDefaults.cardElevation(0.dp)) {
             Row(Modifier.padding(20.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -65,7 +67,7 @@ fun InsightsScreen(viewModel: InsightsViewModel) {
         }
 
         // 每日柱状简图
-        Card(Modifier.fillMaxWidth(), shape = RoundedCornerShape(20.dp),
+        Card(Modifier.fillMaxWidth().sorenShadow(), shape = SorenCardShape,
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)),
             elevation = CardDefaults.cardElevation(0.dp)) {
             Column(Modifier.padding(16.dp)) {
@@ -85,7 +87,7 @@ fun InsightsScreen(viewModel: InsightsViewModel) {
         }
 
         // TOP 支出分类
-        Card(Modifier.fillMaxWidth(), shape = RoundedCornerShape(20.dp),
+        Card(Modifier.fillMaxWidth().sorenShadow(), shape = SorenCardShape,
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)),
             elevation = CardDefaults.cardElevation(0.dp)) {
             Column(Modifier.padding(16.dp)) {
@@ -109,7 +111,7 @@ fun InsightsScreen(viewModel: InsightsViewModel) {
         }
 
         // Soren 点评
-        Card(Modifier.fillMaxWidth(), shape = RoundedCornerShape(20.dp),
+        Card(Modifier.fillMaxWidth().sorenShadow(), shape = SorenCardShape,
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.06f)),
             elevation = CardDefaults.cardElevation(0.dp)) {
             Column(Modifier.padding(16.dp)) {

@@ -24,6 +24,9 @@ import com.soren.bill.ui.theme.AccountIcon
 import com.soren.bill.ui.theme.accountBrandColor
 import com.soren.bill.ui.theme.ExpenseRed
 import com.soren.bill.ui.theme.IncomeGreen
+import com.soren.bill.ui.theme.SorenCardShape
+import com.soren.bill.ui.theme.SorenDialogShape
+import com.soren.bill.ui.theme.sorenShadow
 import com.soren.bill.util.DateUtils
 
 private val bankList = listOf(
@@ -96,8 +99,8 @@ fun AssetsScreen(viewModel: AssetsViewModel) {
 
 @Composable
 fun NetAssetCard(net: Double, total: Double, liability: Double) {
-    Surface(shape = RoundedCornerShape(14.dp), color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)) {
-        Column(Modifier.fillMaxWidth().padding(18.dp)) {
+    Surface(shape = SorenCardShape, color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f), modifier = Modifier.fillMaxWidth().sorenShadow()) {
+        Column(Modifier.padding(18.dp)) {
             Text("净资产（元）", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             Spacer(Modifier.height(2.dp))
             Text(DateUtils.formatAmount(net), style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold, color = if (net >= 0) IncomeGreen else ExpenseRed))
@@ -115,7 +118,7 @@ fun GroupHeader(label: String) = Text(label, Modifier.padding(top = 4.dp), style
 
 @Composable
 fun AccountCard(bal: AccountBalance, onClick: () -> Unit) {
-    Surface(shape = RoundedCornerShape(10.dp), color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f), modifier = Modifier.fillMaxWidth().clickable { onClick() }) {
+    Surface(shape = SorenCardShape, color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f), modifier = Modifier.fillMaxWidth().clickable { onClick() }.sorenShadow()) {
         Row(Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
             AccountIcon(bal.account.type, bal.account.name, 28.dp)
             Spacer(Modifier.width(10.dp))
@@ -137,7 +140,7 @@ fun EditDialog(bal: AccountBalance, onDismiss: () -> Unit, onSave: (Account) -> 
     var limit by remember { mutableStateOf(if (bal.account.creditLimit > 0) bal.account.creditLimit.toLong().toString() else "") }
     var dueDay by remember { mutableStateOf(if (bal.account.paymentDueDay > 0) bal.account.paymentDueDay.toString() else "") }
     var newBal by remember { mutableStateOf("") }
-    AlertDialog(onDismissRequest = onDismiss, shape = RoundedCornerShape(14.dp), title = { Text("编辑账户") }, text = {
+    AlertDialog(onDismissRequest = onDismiss, shape = SorenDialogShape, title = { Text("编辑账户") }, text = {
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Surface(shape = RoundedCornerShape(8.dp), color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)) {
                 Row(Modifier.fillMaxWidth().padding(12.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
@@ -170,7 +173,7 @@ fun AddDialog(onDismiss: () -> Unit, onConfirm: (String, String, Double, Int, Do
     var creditExp by remember { mutableStateOf(false) }; var limit by remember { mutableStateOf("") }
     var due by remember { mutableStateOf("") }; var bal by remember { mutableStateOf("") }; var isCredit by remember { mutableStateOf(false) }
     val cats = listOf("online" to "在线支付", "bank" to "网银", "credit" to "网贷/信用")
-    AlertDialog(onDismissRequest = onDismiss, shape = RoundedCornerShape(14.dp), title = { Text("添加账户") }, text = {
+    AlertDialog(onDismissRequest = onDismiss, shape = SorenDialogShape, title = { Text("添加账户") }, text = {
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) { cats.forEach { (v, l) -> FilterChip(selected = cat == v, onClick = { cat = v; isCredit = false }, label = { Text(l, fontSize = 12.sp) }, modifier = Modifier.weight(1f)) } }
             when (cat) {
